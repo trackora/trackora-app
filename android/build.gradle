@@ -1,0 +1,57 @@
+ // Top-level build file where you can add configuration options common to all sub-projects/modules.
+// buildscript {
+//     repositories {
+//         mavenCentral()
+//         maven { url "https://artifactory.img.ly/artifactory/imgly" }
+//     }
+//     dependencies {
+//         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.32"
+//         classpath 'ly.img.android.sdk:plugin:10.4.1'
+//     }
+// } 
+buildscript {
+    
+    ext {
+        buildToolsVersion = "33.0.0"
+        minSdkVersion = 21  
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+
+        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
+        ndkVersion = "23.1.7779620"
+        playServicesLocationVersion = "21.0.1"
+        kotlinVersion = "1.8.22"
+    }
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://maven.google.com' }
+        maven { url "https://www.jitpack.io" }
+    }
+
+
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("com.google.gms:google-services:4.4.0")
+    }
+
+    repositories {
+        maven { url "https://jitpack.io" }
+        
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+        
+    }
+
+// allprojects {
+//     repositories {
+//         maven { url 'https://artifactory.img.ly/artifactory/imgly' }
+//     }
+// }
+
+}

@@ -1,0 +1,64 @@
+{
+    "posterType": [
+        {
+            "status": true,
+            "title": "Good Morning Wishes",
+            "icon": {
+                "uri": "http://www.freeimageslive.com/galleries/home/playroom/pics/objects00016g.jpg"
+            },
+            "des": "",
+            "textColor": "#000",
+            "tintColor": "",
+            "images": [
+                {
+                    "image": "http://www.freeimageslive.com/galleries/home/playroom/pics/objects00016g.jpg",
+                    "name": "Yogesh"
+                },
+                {
+                    "image": "http://www.bootleg-objects.com/download/re_sl_totale.jpg",
+                    "name": "Yogesh"
+                }
+            ]
+        },
+        {
+            "status": true,
+            "title": "Christmas Day Wishes",
+            "icon": {
+                "uri": "http://www.bootleg-objects.com/download/re_sl_totale.jpg"
+            },
+            "des": "",
+            "textColor": "#000",
+            "tintColor": "",
+            "images": [
+                {
+                    "image": "http://www.freeimageslive.com/galleries/home/playroom/pics/objects00016g.jpg",
+                    "name": "Yogesh"
+                },
+                {
+                    "image": "http://www.bootleg-objects.com/download/re_sl_totale.jpg",
+                    "name": "Yogesh"
+                }
+            ]
+        },
+        {
+            "status": true,
+            "title": "Good Night Wishes",
+            "icon": {
+                "uri": "http://blogs.ukoln.ac.uk/cultural-heritage/files/2010/03/NIM_1983-99_23.jpg"
+            },
+            "des": "",
+            "textColor": "#000",
+            "tintColor": "",
+            "images": [
+                {
+                    "image": "http://www.freeimageslive.com/galleries/home/playroom/pics/objects00016g.jpg",
+                    "name": "Yogesh"
+                },
+                {
+                    "image": "http://www.bootleg-objects.com/download/re_sl_totale.jpg",
+                    "name": "Yogesh"
+                }
+            ]
+        }
+    ]
+}
