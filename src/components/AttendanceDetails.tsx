@@ -12,38 +12,78 @@ import {
 } from './CustomElements';
 import { useSelector } from 'react-redux';
 
-const AttendanceDetails = ({ openModal, setOpenModal, onSubmit }) => {
-  const initialForm = {
+type AttendanceField = {
+  attendance_type: string | number;
+  travel_mode: string | number;
+  odometer_reading: string;
+  description: string;
+};
+
+type AttendanceDetailsProps = {
+  openModal: boolean;
+  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onSubmit: () => void;
+};
+
+type AttendanceOptionItem = {
+  label: string;
+  code: string | number;
+};
+
+type AttendanceControls = {
+  basic?: {
+    attendance_type_data?: AttendanceOptionItem[];
+    travel_mode_data?: AttendanceOptionItem[];
+  };
+};
+
+type DropDownOption = {
+  label: string;
+  value: string | number;
+};
+
+const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
+  openModal,
+  setOpenModal,
+  onSubmit,
+}) => {
+  const initialForm: AttendanceField = {
     attendance_type: '',
     travel_mode: '',
     odometer_reading: '',
     description: '',
   };
 
-  const [attendField, setAttendField] = React.useState(initialForm);
-  const [errors, setErrors] = React.useState({});
+  const [attendField, setAttendField] =
+    React.useState<AttendanceField>(initialForm);
+  const [errors, setErrors] = React.useState<
+    Partial<Record<keyof AttendanceField, string>>
+  >({});
 
   const controls =
-    useSelector(
+    (useSelector(
       state =>
         state?.login?.data?.attendanceDetailsData?.data?.attendData?.controls,
-    ) || {};
+    ) as AttendanceControls | undefined) || {};
 
   const basic = controls?.basic || {};
 
-  const attendanceTypeOptions =
+  const attendanceTypeOptions: DropDownOption[] =
     basic?.attendance_type_data?.map(item => ({
       label: item.label,
       value: item.code,
     })) || [];
 
-  const travelModeOptions =
+  const travelModeOptions: DropDownOption[] =
     basic?.travel_mode_data?.map(item => ({
       label: item.label,
       value: item.code,
     })) || [];
 
-  const handleOnChange = (field, value) => {
+  const handleOnChange = <K extends keyof AttendanceField>(
+    field: K,
+    value: AttendanceField[K],
+  ) => {
     setAttendField(prev => ({
       ...prev,
       [field]: value,
@@ -54,8 +94,8 @@ const AttendanceDetails = ({ openModal, setOpenModal, onSubmit }) => {
     }));
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof AttendanceField, string>> = {};
     if (!attendField.attendance_type)
       newErrors.attendance_type = 'Attendance type is required';
     if (!attendField.travel_mode)
