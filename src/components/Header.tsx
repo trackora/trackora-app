@@ -6,19 +6,58 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  ImageSourcePropType,
 } from 'react-native';
-import React, { Fragment } from 'react';
+import React from 'react';
 import { heightToDp, widthToDp } from '../helpers/Responsive';
 import * as Config from '../helpers/Config';
-import { CustomDropDownComponent, CustomLine } from './CustomElements';
+import { CustomDropDownComponent } from './CustomElements';
 import * as Icons from '../helpers/Icons';
-import { Path, Svg } from 'react-native-svg';
 
 import LinearGradient from 'react-native-linear-gradient';
-import { Lines_1, SvgcCircle } from '../helpers/Svg';
+import { SvgcCircle } from '../helpers/Svg';
 import { useTranslation } from 'react-i18next';
 
-export const Header_1 = ({ text = '' }) => {
+type Header1Props = {
+  text?: string;
+};
+
+type Header2Props = {
+  leftImage?: ImageSourcePropType | React.ReactElement;
+  rightImage?: ImageSourcePropType | React.ReactElement;
+  onPressRight?: () => void;
+  svg?: boolean;
+  svgLeft?: boolean;
+  commonWidth?: number;
+  commonHeight?: number;
+  leftText?: string;
+  animated?: boolean;
+  tintColorLeft?: string;
+  tintColorRight?: string;
+  onPressLeft?: () => void;
+  rightImageTopText?: string;
+  filterBranch?: boolean;
+  branchData?: Array<{ label: string; value: string | number }>;
+  handleDropDown?: (item: { label: string; value: string | number }) => void;
+  dropDowninitial?: string;
+  helpIcon?: ImageSourcePropType | React.ReactElement;
+  helpIconTintColor?: string;
+  onPresshelpIcon?: () => void;
+};
+
+type Header3Props = {
+  image?: ImageSourcePropType;
+  nameText?: string;
+  onPress?: () => void;
+  uriImage?: string;
+  userData?: {
+    monthly_bonus?: string | number;
+    total_salary_received?: string | number;
+    total_working_hours?: string | number;
+  };
+};
+
+export const Header_1: React.FC<Header1Props> = ({ text = '' }) => {
   const { t } = useTranslation();
   return (
     <View style={Styles.container}>
@@ -55,7 +94,7 @@ export const Header_1 = ({ text = '' }) => {
   );
 };
 
-export const Header_2 = ({
+export const Header_2: React.FC<Header2Props> = ({
   leftImage,
   rightImage,
   onPressRight,
@@ -69,7 +108,7 @@ export const Header_2 = ({
   tintColorRight = Config.Colors.secondary,
   onPressLeft,
   rightImageTopText = '',
-  filterBranch = null,
+  filterBranch = false,
   branchData = [],
   handleDropDown,
   dropDowninitial = '',
@@ -108,7 +147,7 @@ export const Header_2 = ({
           >
             {leftImage ? (
               <TouchableOpacity
-                onPress={() => onPressLeft()}
+                onPress={() => onPressLeft?.()}
                 style={{
                   width: widthToDp(10),
                   height: widthToDp(10),
@@ -170,7 +209,7 @@ export const Header_2 = ({
                     data={branchData}
                     defaultColor={Config.Colors.defaultColor}
                     placeholder={t(Config.adminHomeStackText?.branches)}
-                    onChangeDropDown={item => handleDropDown(item)}
+                    onChangeDropDown={item => handleDropDown?.(item)}
                     containerStyle={{
                       width: widthToDp(50),
                       height: widthToDp(50),
@@ -184,7 +223,7 @@ export const Header_2 = ({
             {rightImage ? (
               <TouchableOpacity
                 style={{ justifyContent: 'center' }}
-                onPress={() => onPressRight()}
+                onPress={() => onPressRight?.()}
               >
                 <View
                   style={{
@@ -233,7 +272,7 @@ export const Header_2 = ({
             {helpIcon ? (
               <TouchableOpacity
                 style={{ justifyContent: 'center' }}
-                onPress={() => onPresshelpIcon()}
+                onPress={() => onPresshelpIcon?.()}
               >
                 <View
                   style={{
@@ -325,7 +364,7 @@ export const Header_2 = ({
           {rightImage ? (
             <TouchableOpacity
               style={{ justifyContent: 'center' }}
-              onPress={() => onPressRight()}
+              onPress={() => onPressRight?.()}
             >
               {svg ? (
                 rightImage
@@ -350,7 +389,13 @@ export const Header_2 = ({
   );
 };
 
-export const Header_3 = ({ image, nameText, onPress, uriImage, userData }) => {
+export const Header_3: React.FC<Header3Props> = ({
+  image,
+  nameText,
+  onPress,
+  uriImage,
+  userData,
+}) => {
   const [imgLoader, setImgLoader] = React.useState(false);
   const { t } = useTranslation();
   console.log('userData===>', userData);
