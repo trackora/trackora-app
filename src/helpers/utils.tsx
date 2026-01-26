@@ -4,6 +4,7 @@ import {
   RESULTS,
   request,
   requestMultiple,
+  check,
 } from 'react-native-permissions';
 import { getData } from './localStorage';
 import i18next from 'i18next';
@@ -11,17 +12,18 @@ import { store } from '../redux/store';
 import { setLanguage } from '../redux/slices/user.slice';
 import * as Config from './Config';
 import ImagePicker from 'react-native-image-crop-picker';
-
-
+ 
+type AlertCallback = (() => void) | undefined;
+ 
 export const AlertBox = (
-  title,
-  textMessage,
-  okText,
-  OkOnPress,
-  cancelText,
-  cancelOnPress,
-  askMeLaterText,
-  askMeLaterOnPress,
+  title: string,
+  textMessage: string,
+  okText?: string,
+  OkOnPress?: AlertCallback,
+  cancelText?: string,
+  cancelOnPress?: AlertCallback,
+  askMeLaterText?: string,
+  askMeLaterOnPress?: AlertCallback,
 ) => {
   return Alert.alert(title, textMessage, [
     askMeLaterText && {
@@ -43,34 +45,35 @@ export const AlertBox = (
     },
   ]);
 };
-
-export const toLocaleDateString = val => {
-  let customDateTimeString = new Date(val);
-  let date = val ? new Date(val) : new Date();
-  let timestamp = Date.now();
-  let toLocaleDateString = date.toLocaleDateString('en-us');
-  let customValTimeString = date.toLocaleString('en-US', {
+ 
+export const toLocaleDateString = (val?: string | number | Date) => {
+  const date = val ? new Date(val) : new Date();
+  const timestamp = Date.now();
+  const toLocaleDateString = date.toLocaleDateString('en-us');
+  const customValTimeString = date.toLocaleString('en-US', {
     hour: 'numeric',
     minute: 'numeric',
     hour12: true,
   });
-
-  let day = date.getDate();
-  let month_number = date.getMonth();
-  let year = date.getFullYear();
-  let h = date.getHours();
-  let m = date.getMinutes();
-  let s = date.getSeconds();
-  let customDate = `${year}-${month_number < 10 ? 0 : ''}${month_number + 1}-${
+ 
+  const day = date.getDate();
+  const month_number = date.getMonth();
+  const year = date.getFullYear();
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+  const customDate = `${year}-${month_number < 10 ? 0 : ''}${month_number + 1}-${
     day < 10 ? 0 : ''
   }${day}`;
-  let customMonth = `${year}-${month_number < 10 ? 0 : ''}${month_number + 1}`;
-  var Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat'];
-  let day_name = Days[date.getDay()];
-  let month_name = date.toLocaleString('default', { month: 'long' });
-  let customDateTime =
+  const customMonth = `${year}-${month_number < 10 ? 0 : ''}${
+    month_number + 1
+  }`;
+  const Days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const day_name = Days[date.getDay()];
+  const month_name = date.toLocaleString('default', { month: 'long' });
+  const customDateTime =
     date.toLocaleDateString('en-us') + ' ' + h + ':' + m + ':' + s + ' ';
-  let customTime = date.toLocaleString('en-US', {
+  const customTime = date.toLocaleString('en-US', {
     hour: 'numeric',
     minute: 'numeric',
     hour12: true,
@@ -91,95 +94,69 @@ export const toLocaleDateString = val => {
     customMonth,
   };
 };
-export const toLocaleDateTime = date => {
-  let dateTime = new Date(date);
+ 
+export const toLocaleDateTime = (date: string | number | Date) => {
+  let dateTime: string | Date = new Date(date);
   dateTime = dateTime.toLocaleString('en-GB', {
     timeZone: 'UTC',
     hour12: true,
   });
   return dateTime;
 };
-export const customDateFormet = val => {
-  let date = val ? new Date(val) : new Date();
-  let day = date.getDate();
-  let month = date.getMonth();
-  let year = date.getFullYear();
-  let customDate = `${year}-${month}-${day}`;
+ 
+export const customDateFormet = (val?: string | number | Date) => {
+  const date = val ? new Date(val) : new Date();
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+  const customDate = `${year}-${month}-${day}`;
   return customDate;
 };
-// For converting whole date to yyyy-mm-dd hh:mm:ss
-
-export const formatToYMDHMS = dateString => {
+ 
+export const formatToYMDHMS = (dateString?: string) => {
   if (!dateString) return '';
-
+ 
   const dateObj = toLocaleDateString(dateString);
-
+ 
   const yyyy = dateObj.year;
   const mm = (dateObj.month_number + 1).toString().padStart(2, '0');
   const dd = dateObj.day.toString().padStart(2, '0');
-
+ 
   const hh = dateObj.h.toString().padStart(2, '0');
   const min = dateObj.customTime.split(':')[1].split(' ')[0].padStart(2, '0');
   const ss = dateObj.customDateTime
     .split(':')[2]
     .split(' ')[0]
     .padStart(2, '0');
-  console.log('reached', `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`);
-
+ 
   return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
 };
-
+ 
 export const handleCamera = async (
-  type,
-  openType = 'openPicker',
+  type: 'photo' | 'video',
+  openType: 'openPicker' | 'openCamera' = 'openPicker',
   multiple = false,
 ) => {
   const pickerOptions = {
-    width: 300, // resize width
-    height: 400, // resize height
+    width: 300,
+    height: 400,
     includeBase64: true,
     multiple: multiple,
     includeExif: true,
     mediaType: type,
-    compressImageQuality: 0.1, // compress to 60%
+    compressImageQuality: 0.1,
   };
-  let data;
+  let data: any;
+ 
   if (openType === 'openPicker') {
-    try {
-      data = await ImagePicker.openPicker(pickerOptions);
-      await ImagePicker.clean()
-        .then(() => {
-          console.log('removed all tmp images from tmp directory');
-        })
-        .catch(e => {
-          console.log(e);
-        });
-      console.log('data-1', data);
-      return data;
-    } catch (error) {
-      console.log('error', error);
-      if (error) {
-        throw error;
-      }
-    }
+    data = await ImagePicker.openPicker(pickerOptions);
   } else {
-    try {
-     data = await ImagePicker.openCamera(pickerOptions);
-     // Clean temporary images
-    ImagePicker.clean()
-      .then(() => console.log('Removed all tmp images'))
-      .catch(e => console.log('Clean error', e));
-
-      console.log('data-2', data);
-      return data;
-    } catch (error) {
-      console.log('error', error);
-      if (error) {
-        throw error;
-      }
-    }
+    data = await ImagePicker.openCamera(pickerOptions);
   }
+  await ImagePicker.clean().catch(e => console.log('Clean error', e));
+  return data;
 };
+ 
 export const requestPermissionsAndroid = async () => {
   if (Platform.OS === 'android') {
     try {
@@ -191,28 +168,8 @@ export const requestPermissionsAndroid = async () => {
         PERMISSIONS.ANDROID.ACCESS_BACKGROUND_LOCATION,
         PERMISSIONS.ANDROID.RECORD_AUDIO,
         PERMISSIONS.ANDROID.CALL_PHONE,
-      ]).then(statuses => {
-        return statuses;
-        console.log('Camera', statuses[PERMISSIONS.IOS.CAMERA]);
-        console.log('FaceID', statuses[PERMISSIONS.IOS.FACE_ID]);
-      });
-      // const grants = await PermissionsAndroid.requestMultiple([
-      //     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      //     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      //     PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      //     PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-      //     PermissionsAndroid.PERMISSIONS.INTERNET,
-      //     {
-      //       title: 'Location Permission',
-      //       message: 'This app requires access to your location.',
-      //       buttonPositive: 'OK',
-      //       buttonNegative: 'Cancel',
-      //     },
-      // ]);
-
-      // console.log('write external stroage', grants);
-
+      ]);
+ 
       if (
         grants['android.permission.WRITE_EXTERNAL_STORAGE'] ===
           PermissionsAndroid.RESULTS.GRANTED &&
@@ -232,18 +189,17 @@ export const requestPermissionsAndroid = async () => {
     }
   }
 };
-
+ 
 export const AlertDialog = (
-  tile,
-  message,
-  okayText,
-  okayFunction,
-  cancelText,
-  cancelFunction,
-  askLaterText,
-  askLaterFunction,
+  tile: string,
+  message: string,
+  okayText?: string,
+  okayFunction?: AlertCallback,
+  cancelText?: string,
+  cancelFunction?: AlertCallback,
+  askLaterText?: string,
+  askLaterFunction?: AlertCallback,
 ) => {
-  console.log('askLaterText', cancelText, askLaterText);
   return Platform.OS === 'android'
     ? Alert.alert(tile, message, [
         askLaterText !== undefined && {
@@ -251,7 +207,7 @@ export const AlertDialog = (
           onPress: () =>
             askLaterFunction
               ? askLaterFunction()
-              : console.log('click on Ask me letter button'),
+              : console.log('click on Ask me later button'),
         },
         cancelText !== undefined && {
           text: cancelText,
@@ -275,26 +231,19 @@ export const AlertDialog = (
         },
       ]);
 };
-
+ 
 const requestBackground = async () => {
-  let status = await PermissionsAndroid.request(
+  const granted = await PermissionsAndroid.requestMultiple([
     PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
     PermissionsAndroid.PERMISSIONS.INTERNET,
-    PERMISSIONS.ANDROID.POST_NOTIFICATIONS,
     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    {
-      title: 'Location Permission',
-      message: 'This app requires access to your location.',
-      buttonNeutral: 'Ask Me Later',
-      buttonNegative: 'Cancel',
-      buttonPositive: 'OK',
-    },
-  );
-  return status;
+  ]);
+  return granted;
 };
+ 
 export const requestBackgroundPermission = async () => {
   if (Platform.OS === 'android') {
     try {
@@ -307,78 +256,48 @@ export const requestBackgroundPermission = async () => {
     try {
       const result = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-        PermissionsAndroid.PERMISSIONS.INTERNET,
-        PERMISSIONS.ANDROID.POST_NOTIFICATIONS,
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       );
-      console.log('checkResult', result);
       if (result === false) {
-        let status = await requestBackground();
-        console.log('status', status);
-        if (status === 'never_ask_again') {
+        const status = await requestBackground();
+        const allGranted = Object.values(status).every(
+          s => s === PermissionsAndroid.RESULTS.GRANTED,
+        );
+        if (!allGranted) {
           AlertDialog(
             'Location Permission Blocked',
             'To enable location services `Allow All the time`, please go to your device settings and enable location access for this app.',
             'Okay',
             () => Linking.openSettings(),
           );
-        } else if (status === 'denied') {
-          AlertDialog(
-            'Location Permission Blocked',
-            'To enable location services `Allow All the time`, please go to your device settings and enable location access for this app.',
-            'Okay',
-            () => Linking.openSettings(),
-          );
-        } else if (status === 'granted') {
-          AlertDialog(
-            'Location Permission Blocked',
-            'To enable location services `Allow All the time`, please go to your device settings and enable location access for this app.',
-            'Okay',
-            () => Linking.openSettings(),
-          );
-        } else {
-          return status;
         }
+        return status;
       } else if (result === PermissionsAndroid.RESULTS.GRANTED) {
         return result;
       }
-      // return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (error) {
       console.error('Error requesting location permission:', error);
       return false;
     }
   } else {
     try {
-      // const auth = await Geolocation.requestAuthorization('whenInUse');
-      request(PERMISSIONS.IOS.LOCATION_ALWAYS).then(result => {
+      request(PERMISSIONS.IOS.LOCATION_ALWAYS).then(() => {
         check(PERMISSIONS.IOS.LOCATION_ALWAYS)
           .then(result => {
             switch (result) {
               case RESULTS.UNAVAILABLE:
-                console.log(
-                  'This feature is not available (on this device / in this context)',
-                );
+                console.log('This feature is not available');
                 break;
               case RESULTS.DENIED:
-                console.log(
-                  'The permission has not been requested / is denied but requestable',
-                );
+                console.log('Permission denied but requestable');
                 break;
               case RESULTS.LIMITED:
-                console.log(
-                  'The permission is limited: some actions are possible',
-                );
+                console.log('Permission is limited');
                 break;
               case RESULTS.GRANTED:
-                console.log('The permission is granted');
+                console.log('Permission granted');
                 break;
               case RESULTS.BLOCKED:
-                console.log(
-                  'The permission is denied and not requestable anymore',
-                );
+                console.log('Permission denied and not requestable');
                 break;
             }
           })
@@ -386,33 +305,25 @@ export const requestBackgroundPermission = async () => {
             console.log('error', error);
           });
       });
-      // console.log("auth",auth)
-      // if (auth === 'granted') {
-      //   return auth;
-      // }
     } catch (error) {
       console.error('Error requesting location permission:', error);
       return false;
     }
   }
 };
-
+ 
 export const requestStoragePermission = async () => {
   try {
-    const granted = await PermissionsAndroid.request(
+    const granted = await PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      {
-        title: 'Cool Photo App Camera Permission',
-        message:
-          'Cool Photo App needs access to your camera ' +
-          'so you can take awesome pictures.',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
+    ]);
+ 
+    const allGranted = Object.values(granted).every(
+      s => s === PermissionsAndroid.RESULTS.GRANTED,
     );
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+ 
+    if (allGranted) {
       console.log('You can use the camera');
       return granted;
     } else {
@@ -424,19 +335,20 @@ export const requestStoragePermission = async () => {
     return false;
   }
 };
+ 
 export const isReachable = async () => {
-  const timeout = new Promise((resolve, reject) => {
+  const timeout = new Promise((_, reject) => {
     setTimeout(reject, 5000, 'Request timed out');
   });
   const request = fetch(Config.baseUrl);
   try {
-    const response = await Promise.race([timeout, request]);
-    console.log('response', response);
+    await Promise.race([timeout, request]);
     return true;
   } catch (error) {
     return 'Error';
   }
 };
+ 
 export const setDefaultLan = async () => {
   const getLanguage = await getData('current_language');
   if (getLanguage) {
@@ -447,42 +359,42 @@ export const setDefaultLan = async () => {
     i18next.changeLanguage('en');
   }
 };
-
-// Format to HH:mm:ss
-export const formatTime = date => {
-  let h = date.getHours().toString().padStart(2, '0');
-  let m = date.getMinutes().toString().padStart(2, '0');
-  let s = date.getSeconds().toString().padStart(2, '0');
+ 
+export const formatTime = (date: Date) => {
+  const h = date.getHours().toString().padStart(2, '0');
+  const m = date.getMinutes().toString().padStart(2, '0');
+  const s = date.getSeconds().toString().padStart(2, '0');
   return `${h}:${m}:${s}`;
 };
-
-export const fomatTrackCapturedDate = val => {
+ 
+export const fomatTrackCapturedDate = (val?: string | number | Date) => {
   const date = val ? new Date(val) : new Date();
-
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   const h = String(date.getHours()).padStart(2, '0');
   const m = String(date.getMinutes()).padStart(2, '0');
   const s = String(date.getSeconds()).padStart(2, '0');
-
   return `${year}-${month}-${day} ${h}:${m}:${s}`;
 };
-
-export const logCurl = (url, method = 'POST', headers = {}, body = {}) => {
+ 
+export const logCurl = (
+  url: string,
+  method = 'POST',
+  headers: Record<string, string> = {},
+  body: Record<string, unknown> = {},
+) => {
   try {
     let curl = `curl -X ${method.toUpperCase()} "${url}"`;
-
-    // Add headers
+ 
     Object.keys(headers).forEach(key => {
       curl += ` -H "${key}: ${headers[key]}"`;
     });
-
-    // Add body for POST/PUT/PATCH
+ 
     if (['POST', 'PUT', 'PATCH'].includes(method.toUpperCase()) && body) {
       curl += ` -d '${JSON.stringify(body)}'`;
     }
-
+ 
     console.log('💻 CURL Command:\n', curl);
     return curl;
   } catch (error) {

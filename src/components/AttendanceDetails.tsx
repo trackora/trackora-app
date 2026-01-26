@@ -1,16 +1,20 @@
-import React from 'react';
-import CustomModal from './CustomModal';
-import { ScrollView, Text, View, StyleSheet } from 'react-native';
-import { heightToDp, widthToDp } from '../helpers/Responsive';
-import * as Config from '../helpers/Config';
-import * as Icons from '../helpers/Icons';
-import { Header_2 } from './Header';
+import React from "react";
+import CustomModal from "./CustomModal";
+import { ScrollView, Text, View, StyleSheet } from "react-native";
+import { heightToDp, widthToDp } from "../helpers/Responsive";
+import * as Config from "../helpers/Config";
+import * as Icons from "../helpers/Icons";
+import { Header_2 } from "./Header";
 import {
   CustomDropDownComponent,
   CustomInput,
   CustomLinearButton,
-} from './CustomElements';
-import { useSelector } from 'react-redux';
+} from "./CustomElements";
+import { useSelector } from "react-redux";
+
+const CustomInputAny = CustomInput as React.ComponentType<any>;
+const CustomDropDownAny = CustomDropDownComponent as React.ComponentType<any>;
+const CustomLinearButtonAny = CustomLinearButton as React.ComponentType<any>;
 
 type AttendanceField = {
   attendance_type: string | number;
@@ -48,10 +52,10 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
   onSubmit,
 }) => {
   const initialForm: AttendanceField = {
-    attendance_type: '',
-    travel_mode: '',
-    odometer_reading: '',
-    description: '',
+    attendance_type: "",
+    travel_mode: "",
+    odometer_reading: "",
+    description: "",
   };
 
   const [attendField, setAttendField] =
@@ -62,20 +66,20 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
 
   const controls =
     (useSelector(
-      state =>
+      (state: any) =>
         state?.login?.data?.attendanceDetailsData?.data?.attendData?.controls,
     ) as AttendanceControls | undefined) || {};
 
   const basic = controls?.basic || {};
 
   const attendanceTypeOptions: DropDownOption[] =
-    basic?.attendance_type_data?.map(item => ({
+    basic?.attendance_type_data?.map((item) => ({
       label: item.label,
       value: item.code,
     })) || [];
 
   const travelModeOptions: DropDownOption[] =
-    basic?.travel_mode_data?.map(item => ({
+    basic?.travel_mode_data?.map((item) => ({
       label: item.label,
       value: item.code,
     })) || [];
@@ -84,26 +88,26 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
     field: K,
     value: AttendanceField[K],
   ) => {
-    setAttendField(prev => ({
+    setAttendField((prev) => ({
       ...prev,
       [field]: value,
     }));
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
-      [field]: '', // clear error if user fills again
+      [field]: "",
     }));
   };
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof AttendanceField, string>> = {};
     if (!attendField.attendance_type)
-      newErrors.attendance_type = 'Attendance type is required';
+      newErrors.attendance_type = "Attendance type is required";
     if (!attendField.travel_mode)
-      newErrors.travel_mode = 'Travel mode is required';
+      newErrors.travel_mode = "Travel mode is required";
     if (!attendField.odometer_reading)
-      newErrors.odometer_reading = 'Odometer reading is required';
+      newErrors.odometer_reading = "Odometer reading is required";
     if (!attendField.description)
-      newErrors.description = 'Description is required';
+      newErrors.description = "Description is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -128,7 +132,6 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
           alignItems="center"
           justifyContent="center"
           disableOnPress={false}
-          showHeader={true}
           animationType="slide"
         >
           <ScrollView
@@ -145,17 +148,16 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                 leftImage={Icons.arrow_back}
                 commonWidth={widthToDp(12)}
                 commonHeight={heightToDp(5)}
-                leftText={'Start Attendance'}
+                leftText={"Start Attendance"}
                 animated={true}
                 onPressLeft={() => setOpenModal(false)}
               />
 
               <View style={styles.formCard}>
-                {/* Attendance Type */}
                 <View style={styles.fieldGroup}>
                   <Text style={styles.label}>Attendance Type</Text>
-                  <CustomDropDownComponent
-                    commonWidth={'100%'}
+                  <CustomDropDownAny
+                    commonWidth={"100%"}
                     commonHeight={50}
                     borderColor={
                       errors.attendance_type
@@ -163,8 +165,8 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                         : Config.Colors.borderColor
                     }
                     data={attendanceTypeOptions}
-                    onChangeDropDown={val =>
-                      handleOnChange('attendance_type', val)
+                    onChangeDropDown={(val: any) =>
+                      handleOnChange("attendance_type", val)
                     }
                     backgroundColor={Config.Colors.defaultColor}
                     initialValue={attendField?.attendance_type}
@@ -176,11 +178,10 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                   )}
                 </View>
 
-                {/* Travel Mode */}
                 <View style={styles.fieldGroup}>
                   <Text style={styles.label}>Travel Mode</Text>
-                  <CustomDropDownComponent
-                    commonWidth={'100%'}
+                  <CustomDropDownAny
+                    commonWidth={"100%"}
                     commonHeight={50}
                     borderColor={
                       errors.travel_mode
@@ -188,7 +189,9 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                         : Config.Colors.borderColor
                     }
                     data={travelModeOptions}
-                    onChangeDropDown={val => handleOnChange('travel_mode', val)}
+                    onChangeDropDown={(val: any) =>
+                      handleOnChange("travel_mode", val)
+                    }
                     backgroundColor={Config.Colors.defaultColor}
                     initialValue={attendField?.travel_mode}
                   />
@@ -197,20 +200,19 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                   )}
                 </View>
 
-                {/* Odometer Reading */}
                 <View style={styles.fieldGroup}>
                   <Text style={styles.label}>Odometer Reading</Text>
-                  <CustomInput
-                    placeholder={'Enter Odometer reading'}
-                    keyboardType={'numeric'}
-                    autoCapitalize={'none'}
-                    autoComplete={'off'}
+                  <CustomInputAny
+                    placeholder={"Enter Odometer reading"}
+                    keyboardType={"numeric"}
+                    autoCapitalize={"none"}
+                    autoComplete={"off"}
                     bgColor={Config.Colors.inputField}
-                    onChangeText={text =>
-                      handleOnChange('odometer_reading', text)
+                    onChangeText={(text: string) =>
+                      handleOnChange("odometer_reading", text)
                     }
                     value={attendField?.odometer_reading}
-                    commonWidth={'100%'}
+                    commonWidth={"100%"}
                     commonHeight={widthToDp(12)}
                     textAlignVertical="center"
                     borderColor={
@@ -218,6 +220,8 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                         ? Config.Colors.errorFieldBorder
                         : Config.Colors.borderColor
                     }
+                    lable=""
+                    countryCode=""
                   />
                   {errors.odometer_reading && (
                     <Text style={styles.errorText}>
@@ -226,18 +230,19 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                   )}
                 </View>
 
-                {/* Description */}
                 <View style={styles.fieldGroup}>
                   <Text style={styles.label}>Description</Text>
-                  <CustomInput
-                    placeholder={'Enter description'}
-                    keyboardType={'default'}
-                    autoCapitalize={'none'}
-                    autoComplete={'off'}
+                  <CustomInputAny
+                    placeholder={"Enter description"}
+                    keyboardType={"default"}
+                    autoCapitalize={"none"}
+                    autoComplete={"off"}
                     bgColor={Config.Colors.inputField}
-                    onChangeText={text => handleOnChange('description', text)}
+                    onChangeText={(text: string) =>
+                      handleOnChange("description", text)
+                    }
                     value={attendField?.description}
-                    commonWidth={'100%'}
+                    commonWidth={"100%"}
                     commonHeight={widthToDp(25)}
                     textAlignVertical="top"
                     multiline={true}
@@ -246,19 +251,24 @@ const AttendanceDetails: React.FC<AttendanceDetailsProps> = ({
                         ? Config.Colors.errorFieldBorder
                         : Config.Colors.borderColor
                     }
+                    lable=""
+                    countryCode=""
                   />
                   {errors.description && (
                     <Text style={styles.errorText}>{errors.description}</Text>
                   )}
                 </View>
 
-                {/* Button */}
                 <View style={styles.buttonRow}>
-                  <CustomLinearButton
+                  <CustomLinearButtonAny
                     commonWidth={widthToDp(60)}
-                    text={'Start Attendance'}
+                    text={"Start Attendance"}
                     onPress={handleSubmit}
                     color={Config.Colors.defaultColor}
+                    Icons={null}
+                    tintColor={Config.Colors.defaultColor}
+                    IconsRigth={null}
+                    padding={0}
                   />
                 </View>
               </View>
@@ -276,28 +286,28 @@ const styles = StyleSheet.create({
   innerWrapper: {
     width: widthToDp(100),
     height: heightToDp(100),
-    alignItems: 'center',
+    alignItems: "center",
   },
   formCard: {
     width: widthToDp(90),
     marginTop: 20,
     borderRadius: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 5,
   },
   fieldGroup: {
-    width: '100%',
+    width: "100%",
     marginBottom: 18,
   },
   label: {
     fontSize: widthToDp(3.5),
     fontFamily: Config.fontFamilys.Poppins_Medium,
-    color: '#666',
+    color: "#666",
     marginBottom: 6,
   },
   errorText: {
@@ -309,6 +319,6 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     marginTop: 25,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });

@@ -16,5 +16,6 @@
     }
   },
   "include": ["src", "App.tsx", "index.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+   "extends": "@tsconfig/react-native/tsconfig.json",
 }

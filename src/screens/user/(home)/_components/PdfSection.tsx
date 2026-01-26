@@ -1,15 +1,30 @@
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  ListRenderItemInfo,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Config from '../../../../helpers/Config';
-
-const PdfSection = ({ pdfData }) => {
-  const renderPdfItem = ({ item, index }) => (
+ 
+type PdfItem = {
+  title: string;
+};
+ 
+type PdfData = {
+  heading: string;
+  items: PdfItem[];
+};
+ 
+type PdfSectionProps = {
+  pdfData: PdfData;
+};
+ 
+const PdfSection: React.FC<PdfSectionProps> = ({ pdfData }) => {
+  const renderPdfItem = ({ item }: ListRenderItemInfo<PdfItem>) => (
     <TouchableOpacity style={styles.pdfItem}>
       <LinearGradient
         colors={['#FFFFFF', '#F8FAFC']}
@@ -25,12 +40,12 @@ const PdfSection = ({ pdfData }) => {
             <Text style={styles.pdfEmoji}>📄</Text>
           </LinearGradient>
         </View>
-
+ 
         <View style={styles.pdfContent}>
           <Text style={styles.pdfTitle}>{item.title}</Text>
           <Text style={styles.pdfSize}>PDF Document</Text>
         </View>
-
+ 
         <TouchableOpacity style={styles.downloadButton}>
           <LinearGradient
             colors={['#4F46E5', '#7C3AED']}
@@ -42,25 +57,25 @@ const PdfSection = ({ pdfData }) => {
       </LinearGradient>
     </TouchableOpacity>
   );
-
+ 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.heading}>{pdfData.heading}</Text>
         <Text style={styles.subheading}>Tap to download documents</Text>
       </View>
-
+ 
       <FlatList
         data={pdfData.items}
         renderItem={renderPdfItem}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_, index) => index.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
       />
     </View>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#F8FAFC',
@@ -136,5 +151,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
+ 
 export default PdfSection;

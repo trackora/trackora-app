@@ -3,22 +3,31 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Touchable,
   TouchableOpacity,
   Image,
+  TextInputProps,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
 } from 'react-native';
 import React, { useRef } from 'react';
 import { heightToDp, widthToDp } from '../helpers/Responsive';
 import * as Config from '../helpers/Config';
-import * as Icons from '../helpers/Icons';
 import LinearGradient from 'react-native-linear-gradient';
-import { Dropdown, SelectCountry } from 'react-native-element-dropdown';
+import { Dropdown } from 'react-native-element-dropdown';
 import country_code from '../../country_code.json';
-import { SvgXml } from 'react-native-svg';
-import { Search_icon } from '../helpers/Svg';
 import Checkbox from 'react-native-check-box';
-
-export const CustomLine = ({
+ 
+type CustomLineProps = {
+  commonWidth?: number;
+  commonHight?: number;
+  bgColor?: string;
+  justifyContent?: ViewStyle['justifyContent'];
+  alignSelf?: ViewStyle['alignSelf'];
+};
+ 
+export const CustomLine: React.FC<CustomLineProps> = ({
   commonWidth = widthToDp(40),
   commonHight = heightToDp(2),
   bgColor = '#fff',
@@ -26,70 +35,65 @@ export const CustomLine = ({
   alignSelf = 'flex-start',
 }) => {
   return (
-    <View style={{ justifyContent: justifyContent, alignSelf: alignSelf }}>
+    <View style={{ justifyContent, alignSelf }}>
       <View
         style={{
           width: commonWidth,
           backgroundColor: bgColor,
           height: commonHight,
         }}
-      ></View>
+      />
     </View>
   );
 };
-export const CustomCheckBox = ({
-  isChecked,
-  onChange,
-  style,
-  rightText,
-  rightTextStyle,
-  checkBoxColor,
-  onClick,
-  checkedCheckBoxColor,
-  uncheckedCheckBoxColor,
-  leftText,
-  leftTextStyle,
-}) => {
-  return (
-    <Checkbox
-      onClick={onClick}
-      isChecked={isChecked}
-      onChange={onChange}
-      style={style}
-      rightText={rightText}
-      rightTextStyle={rightTextStyle}
-      checkBoxColor={checkBoxColor}
-      checkedCheckBoxColor={checkedCheckBoxColor}
-      uncheckedCheckBoxColor={uncheckedCheckBoxColor}
-      leftText={leftText}
-      leftTextStyle={leftTextStyle}
-    />
-  );
+ 
+type CustomCheckBoxProps = {
+  isChecked?: boolean;
+  onChange?: (checked: boolean) => void;
+  style?: StyleProp<ViewStyle>;
+  rightText?: string;
+  rightTextStyle?: StyleProp<TextStyle>;
+  checkBoxColor?: string;
+  onClick?: () => void;
+  checkedCheckBoxColor?: string;
+  uncheckedCheckBoxColor?: string;
+  leftText?: string;
+  leftTextStyle?: StyleProp<TextStyle>;
 };
-
-// export const CustomRadioButton = ({ onPress, radioButtons, layout, containerStyle, label, labelStyle, disabled, color, borderSize, borderColor, size }) => {
-//   return (
-//     <RadioGroup
-//       onPress={onPress}
-//       radioButtons={radioButtons}
-//       layout={layout}
-//       containerStyle={containerStyle}
-//       label={label}
-//       labelStyle={labelStyle}
-//       disabled={disabled}
-//       color={color}
-//       borderSize={borderSize}
-//       borderColor={borderColor}
-//       size={size}
-//     />
-//   )
-// }
-
-export const CustomInputBox = ({
+ 
+export const CustomCheckBox: React.FC<CustomCheckBoxProps> = props => {
+  return <Checkbox {...props} />;
+};
+ 
+type CustomInputBoxProps = {
+  commonWidth?: number;
+  commonHeight?: number;
+  borderColor?: string;
+  onChangeText?: (text: string) => void;
+  inputValue?: string;
+  placeholder?: string;
+  keyboardType?: TextInputProps['keyboardType'];
+  autoComplete?: TextInputProps['autoComplete'];
+  errorMessage?: string;
+  numberOfLines?: number;
+  autoCapitalize?: TextInputProps['autoCapitalize'];
+  leftImage?: any;
+  tintColor?: string;
+  rightImage?: any;
+  commmonBorderRadius?: number;
+  commonBackgroundColor?: string;
+  CommonBorderWidth?: number;
+  commonElevation?: number;
+  onFocusFunction?: () => void;
+  editable?: boolean;
+  multiline?: boolean;
+};
+ 
+export const CustomInputBox: React.FC<CustomInputBoxProps> = ({
   commonWidth = widthToDp(100),
   commonHeight = widthToDp(12),
   borderColor = Config.Colors.themeColor,
-  onChangeText,
+  onChangeText = () => {},
   inputValue,
   placeholder,
   keyboardType,
@@ -113,10 +117,9 @@ export const CustomInputBox = ({
       style={{
         width: commonWidth,
         height: commonHeight,
-        borderWidth: 1,
         borderRadius: commmonBorderRadius,
         backgroundColor: commonBackgroundColor,
-        borderWidth: CommonBorderWidth,
+        borderWidth: CommonBorderWidth ?? 1,
         elevation: commonElevation,
       }}
     >
@@ -135,7 +138,7 @@ export const CustomInputBox = ({
             style={{
               width: 20,
               height: 20,
-              tintColor: { tintColor },
+              tintColor: tintColor,
             }}
           />
         </View>
@@ -144,7 +147,6 @@ export const CustomInputBox = ({
         editable={editable}
         style={{
           width: commonWidth,
-          // height: commonHeight,
           paddingLeft: leftImage ? 50 : 15,
           fontFamily: Config.fontFamilys.Poppins_Medium,
           borderWidth: 1,
@@ -162,7 +164,6 @@ export const CustomInputBox = ({
         placeholder={placeholder}
         keyboardType={keyboardType}
         autoComplete={autoComplete}
-        // autoComplete='given-name'
         multiline={multiline}
         numberOfLines={numberOfLines}
         autoCapitalize={autoCapitalize}
@@ -182,7 +183,7 @@ export const CustomInputBox = ({
             style={{
               width: 20,
               height: 20,
-              tintColor: { tintColor },
+              tintColor: tintColor,
             }}
           />
         </View>
@@ -193,7 +194,27 @@ export const CustomInputBox = ({
     </View>
   );
 };
-export const CustomDropDownComponent = ({
+ 
+type DropDownItem = {
+  label: string;
+  value: string | number;
+};
+ 
+type CustomDropDownProps = {
+  commonWidth?: number;
+  commonHeight?: number;
+  borderColor?: string | null;
+  errorMessage?: string;
+  data?: DropDownItem[];
+  placeholder?: string;
+  onChangeDropDown?: (value: string | number) => void;
+  backgroundColor?: string | null;
+  initialValue?: string | number | null;
+  defaultColor?: string | null;
+  containerStyle?: StyleProp<ViewStyle>;
+};
+ 
+export const CustomDropDownComponent: React.FC<CustomDropDownProps> = ({
   commonWidth = widthToDp(100),
   commonHeight = widthToDp(10),
   borderColor = null,
@@ -206,12 +227,14 @@ export const CustomDropDownComponent = ({
   defaultColor = null,
   containerStyle,
 }) => {
-  const [value, setValue] = React.useState();
-  console.log('value', value);
+  const [value, setValue] = React.useState<string | number | null>(
+    initialValue,
+  );
   React.useEffect(() => {
-    setValue(initialValue);
+    setValue(initialValue ?? null);
   }, [initialValue]);
   const [isFocus, setIsFocus] = React.useState(false);
+ 
   const renderLabel = () => {
     if (value || isFocus) {
       return placeholder ? (
@@ -219,9 +242,7 @@ export const CustomDropDownComponent = ({
           <Text
             style={[
               {
-                color: '#FFF',
-                color: defaultColor,
-                // position: 'absolute',
+                color: defaultColor ?? '#FFF',
                 top: 5,
                 zIndex: 999,
                 paddingHorizontal: 8,
@@ -236,9 +257,9 @@ export const CustomDropDownComponent = ({
     }
     return null;
   };
-
+ 
   return (
-    <View style={{}}>
+    <View>
       {placeholder ? renderLabel() : null}
       <Dropdown
         style={[
@@ -287,16 +308,8 @@ export const CustomDropDownComponent = ({
         onChange={item => {
           setValue(item.value);
           setIsFocus(false);
-          onChangeDropDown(item.value);
+          onChangeDropDown?.(item.value);
         }}
-        // renderLeftIcon={() => (
-        //   <AntDesign
-        //     style={styles.icon}
-        //     color={isFocus ? 'blue' : 'black'}
-        //     name="Safety"
-        //     size={20}
-        //   />
-        // )}
       />
       {errorMessage ? (
         <Text style={{ color: Config.Colors.black }}>{errorMessage}</Text>
@@ -304,8 +317,16 @@ export const CustomDropDownComponent = ({
     </View>
   );
 };
-
-export const SelectCountryScreen = ({
+ 
+type SelectCountryScreenProps = {
+  onChangeText: (value: string) => void;
+  defaultCode?: string;
+  commonWidth?: number;
+  commonHeight?: number;
+  containerStyle?: StyleProp<ViewStyle>;
+};
+ 
+export const SelectCountryScreen: React.FC<SelectCountryScreenProps> = ({
   onChangeText,
   defaultCode,
   commonWidth = widthToDp(25),
@@ -334,13 +355,11 @@ export const SelectCountryScreen = ({
       maxHeight={200}
       value={country}
       autoScroll={false}
-      data={country_code}
+      data={country_code as any}
       valueField="value"
       labelField="lable"
       searchPlaceholder="Search..."
-      onChangeText={() => {
-        console.log('tes');
-      }}
+      onChangeText={() => {}}
       onChange={e => {
         setCountry(e.value);
         onChangeText(e.value);
@@ -348,13 +367,50 @@ export const SelectCountryScreen = ({
     />
   );
 };
-
-export const CustomInput = ({
+ 
+type CustomInputProps = {
+  lable?: string;
+  placeholder?: string;
+  keyboardType?: TextInputProps['keyboardType'];
+  autoComplete?: TextInputProps['autoComplete'];
+  onChangeText?: (text: string) => void;
+  value?: string;
+  commonHeight?: number;
+  commonWidth?: number;
+  bgColor?: string;
+  borderBottomRightRadius?: number;
+  borderTopRightRadius?: number;
+  borderRadius?: number;
+  countryCodeStatus?: boolean;
+  countryCode?: string;
+  maxLength?: number;
+  textAlign?: TextInputProps['textAlign'];
+  inputColor?: string;
+  ref?: any;
+  autoCapitalize?: TextInputProps['autoCapitalize'];
+  numberOfLines?: number;
+  borderColor?: string;
+  multiline?: boolean;
+  backgroundColor?: string;
+  textAlignVertical?: TextInputProps['textAlignVertical'];
+  errorMessage?: string;
+  leftImage?: any;
+  tintColor?: string;
+  returnKeyType?: TextInputProps['returnKeyType'];
+  onSubmitEditing?: (e: any) => void;
+  onChange?: (text: string) => void;
+  fontSize?: number;
+  editable?: boolean;
+  onFocusFunction?: () => void;
+  autoFocus?: boolean;
+};
+ 
+export const CustomInput: React.FC<CustomInputProps> = ({
   lable,
   placeholder = '',
   keyboardType = 'default',
   autoComplete = 'email',
-  onChangeText,
+  onChangeText = () => {},
   value,
   commonHeight = widthToDp(12),
   commonWidth = widthToDp(60),
@@ -385,18 +441,11 @@ export const CustomInput = ({
   onFocusFunction,
   autoFocus,
 }) => {
-  const inputRef = useRef(null);
   return (
     <>
       <View>
         <View>{lable ? <Text style={styles.lable}>{lable}</Text> : null}</View>
-        <View
-          style={{
-            // justifyContent: 'center',
-            // alignItems: 'center',
-            flexDirection: 'row',
-          }}
-        >
+        <View style={{ flexDirection: 'row' }}>
           {leftImage ? (
             <View
               style={{
@@ -407,7 +456,6 @@ export const CustomInput = ({
                 height: commonHeight,
                 position: 'absolute',
                 zIndex: 2,
-                // backgroundColor:'#000'
               }}
             >
               <Image
@@ -448,7 +496,6 @@ export const CustomInput = ({
             onChangeText={text => onChangeText(text)}
             maxLength={maxLength}
             value={value}
-            // onSubmitEditing={(e) =>onSubmitEditing(e.nativeEvent.text)}
             returnKeyType={returnKeyType}
             autoCapitalize={autoCapitalize}
             numberOfLines={numberOfLines}
@@ -457,13 +504,33 @@ export const CustomInput = ({
           />
         </View>
         {errorMessage ? (
-          <Text style={{ color: borderColor, marginTop:5 }}>{errorMessage}</Text>
+          <Text style={{ color: borderColor, marginTop: 5 }}>
+            {errorMessage}
+          </Text>
         ) : null}
       </View>
     </>
   );
 };
-export const CustomMultiInput = ({
+ 
+type CustomMultiInputProps = {
+  lable?: string;
+  placeholder?: string;
+  keyboardType?: TextInputProps['keyboardType'];
+  autoComplete?: TextInputProps['autoComplete'];
+  onChangeFun?: (text: string) => void;
+  value?: string;
+  commonHeight?: number;
+  commonWidth?: number;
+  bgColor?: string;
+  borderRadius?: number;
+  maxLength?: number;
+  textAlign?: TextInputProps['textAlign'];
+  inputColor?: string;
+  length?: number;
+};
+ 
+export const CustomMultiInput: React.FC<CustomMultiInputProps> = ({
   lable,
   placeholder = '',
   keyboardType = 'default',
@@ -477,17 +544,17 @@ export const CustomMultiInput = ({
   maxLength = 10,
   textAlign = 'left',
   inputColor = '#000',
-  length,
+  length = 0,
 }) => {
-  const inputRef = useRef([]);
-  const handleChange = (text, index) => {
+  const inputRef = useRef<TextInput[]>([]);
+  const handleChange = (text: string, index: number) => {
     if (text.length !== 0) {
       return inputRef?.current[index + 1]?.focus();
     } else {
       return inputRef?.current[index - 1]?.focus();
     }
   };
-  const handleBackSpace = (event, index) => {
+  const handleBackSpace = (event: any, index: number) => {
     const { nativeEvent } = event;
     if (nativeEvent.key === 'Backspace') {
       handleChange('', index);
@@ -495,11 +562,9 @@ export const CustomMultiInput = ({
   };
   return (
     <>
-      {[...new Array(length)].map((item, index) => (
+      {[...new Array(length)].map((_, index) => (
         <View key={index}>
-          <View>
-            {lable ? <Text style={styles.lable}>{lable}</Text> : null}
-          </View>
+          <View>{lable ? <Text style={styles.lable}>{lable}</Text> : null}</View>
           <View
             style={{
               justifyContent: 'center',
@@ -523,7 +588,6 @@ export const CustomMultiInput = ({
               autoComplete={autoComplete}
               onChangeText={text => handleChange(text, index)}
               maxLength={maxLength}
-              // value={value}
               ref={ref => {
                 if (ref && !inputRef.current.includes(ref)) {
                   inputRef.current = [...inputRef.current, ref];
@@ -539,7 +603,28 @@ export const CustomMultiInput = ({
     </>
   );
 };
-export const CustomLinearButton = ({
+ 
+type CustomLinearButtonProps = {
+  commonHeight?: number;
+  commonWidth?: number;
+  text?: string;
+  onPress?: () => void;
+  disabled?: boolean;
+  Icons?: any;
+  tintColor?: string;
+  activeOpacity?: number;
+  color?: string;
+  borderRadius?: number;
+  iconHeight?: number;
+  iconWidth?: number;
+  IconsRigth?: any;
+  fontSize?: number;
+  paddingLeft?: number;
+  paddingRight?: number;
+  padding?: number;
+};
+ 
+export const CustomLinearButton: React.FC<CustomLinearButtonProps> = ({
   commonHeight = widthToDp(14),
   commonWidth = widthToDp(20),
   text = '',
@@ -563,10 +648,7 @@ export const CustomLinearButton = ({
       onPress={onPress}
       disabled={disabled}
       activeOpacity={activeOpacity}
-      style={{
-        elevation: 20,
-        // borderRadius: borderRadius
-      }}
+      style={{ elevation: 20 }}
     >
       <LinearGradient
         locations={[0, 0.8]}
@@ -574,11 +656,11 @@ export const CustomLinearButton = ({
         end={{ x: 1, y: 0 }}
         colors={[Config.lineColor.color1, Config.lineColor.color2]}
         style={{
-          paddingLeft: paddingLeft,
-          paddingRight: paddingRight,
-          padding: padding,
+          paddingLeft,
+          paddingRight,
+          padding,
           width: commonWidth,
-          borderRadius: borderRadius,
+          borderRadius,
         }}
       >
         <View
@@ -594,12 +676,11 @@ export const CustomLinearButton = ({
               style={{
                 height: iconHeight,
                 width: iconWidth,
-                tintColor: tintColor,
+                tintColor,
                 resizeMode: 'contain',
               }}
             />
           ) : null}
-
           <Text
             style={{ ...styles.buttonText, fontSize: fontSize, color: color }}
           >
@@ -621,8 +702,22 @@ export const CustomLinearButton = ({
     </TouchableOpacity>
   );
 };
-
-export const CustomButton = ({
+ 
+type CustomButtonProps = {
+  commonHeight?: number;
+  commonWidth?: number;
+  text?: string;
+  onPress?: () => void;
+  disabled?: boolean;
+  Icons?: any;
+  tintColor?: string;
+  activeOpacity?: number;
+  elevation?: number;
+  backgroundColor?: string;
+  color?: string;
+};
+ 
+export const CustomButton: React.FC<CustomButtonProps> = ({
   commonHeight = widthToDp(14),
   commonWidth = widthToDp(20),
   text = '',
@@ -645,8 +740,8 @@ export const CustomButton = ({
         style={{
           ...styles.linearGradient,
           width: commonWidth,
-          backgroundColor: backgroundColor,
-          elevation: elevation,
+          backgroundColor,
+          elevation,
           borderRadius: 100,
         }}
       >
@@ -663,15 +758,24 @@ export const CustomButton = ({
               style={{ height: 22, width: 20, tintColor: '#fff' }}
             />
           ) : null}
-
-          <Text style={{ ...styles.buttonText, color: color }}>{text}</Text>
+          <Text style={{ ...styles.buttonText, color }}>{text}</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 };
+ 
+type ButtonProps = {
+  text?: string;
+  onPress?: () => void;
+  styles?: { linearGradient?: StyleProp<ViewStyle>; btnImage?: StyleProp<ImageStyle>; buttonText?: StyleProp<TextStyle> };
+  image?: any;
+  tintColor?: string;
+  onLongPress?: () => void;
+};
+ 
 export const Button = React.memo(
-  ({ text = '', onPress, styles, image, tintColor, onLongPress }) => {
+  ({ text = '', onPress, styles, image, tintColor }: ButtonProps) => {
     return (
       <TouchableOpacity onPress={onPress}>
         <LinearGradient
@@ -681,11 +785,7 @@ export const Button = React.memo(
           style={styles?.linearGradient}
         >
           {image ? (
-            <Image
-              source={image}
-              style={styles?.btnImage}
-              tintColor={tintColor}
-            />
+            <Image source={image} style={styles?.btnImage} tintColor={tintColor} />
           ) : null}
           <Text style={styles?.buttonText}>{text}</Text>
         </LinearGradient>
@@ -693,9 +793,17 @@ export const Button = React.memo(
     );
   },
 );
-
-// ---- Custom Label Selector ----
-export const CustomLabelSelector = ({
+ 
+type CustomLabelSelectorProps = {
+  label: string;
+  options?: Array<{ label: string; value: string | number }>;
+  selectedValue?: string | number;
+  onSelect: (value: string | number) => void;
+  containerWidth?: number;
+  errorMessage?: string;
+};
+ 
+export const CustomLabelSelector: React.FC<CustomLabelSelectorProps> = ({
   label,
   options = [],
   selectedValue,
@@ -718,8 +826,12 @@ export const CustomLabelSelector = ({
                 style={[
                   styles.optionBox,
                   {
-                    backgroundColor: isSelected ? Config.Colors.themeColor : '#f3f4f6',
-                    borderColor: isSelected ? Config.Colors.themeColor : '#d1d5db',
+                    backgroundColor: isSelected
+                      ? Config.Colors.themeColor
+                      : '#f3f4f6',
+                    borderColor: isSelected
+                      ? Config.Colors.themeColor
+                      : '#d1d5db',
                     shadowOpacity: isSelected ? 0.2 : 0.05,
                     elevation: isSelected ? 4 : 2,
                   },
@@ -744,21 +856,10 @@ export const CustomLabelSelector = ({
     </View>
   );
 };
-
-// export const customCheckBox = ({
-//   commonWidth:widthToDp(40),
-//   commonHight:heightToDp(2),
-// }) => {
-//   return (
-//     <View>
-
-//     </View>
-//   )
-// }
-
+ 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
+    padding: 16,
   },
   lable: {
     fontSize: 24,
@@ -787,7 +888,6 @@ const styles = StyleSheet.create({
     fontFamily: Config.fontFamilys.Poppins_Light,
   },
   linearGradient: {
-    // flex: 1,
     paddingLeft: 15,
     paddingRight: 15,
     borderRadius: 50,
@@ -798,27 +898,6 @@ const styles = StyleSheet.create({
     margin: 10,
     color: Config.Colors.black,
     fontWeight: Config.WEIGHTS.medium,
-  },
-  container: {
-    // backgroundColor: 'white',
-    padding: 16,
-  },
-  dropdown: {
-    // borderWidth: 1,
-    // borderRadius: 6,
-    // paddingHorizontal: 8,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    // position: 'absolute',
-    // left: 0,
-    // top: 1,
-    // zIndex: 999,
-    // paddingHorizontal: 8,
-    // fontSize: 10,
-    // color: Config.Colors.black
   },
   placeholderStyle: {
     fontSize: 16,
@@ -835,38 +914,7 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-  mainLabel: {
-    fontSize: widthToDp(3.5),
-    fontWeight: '600',
-    marginBottom: 8,
-    color: Config.Colors.black,
-  },
-  container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  option: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    backgroundColor: Config.Colors.inputField,
-    borderWidth: 1,
-    borderColor: Config.Colors.borderColor,
-  },
-  selectedOption: {
-    backgroundColor: Config.Colors.themeColor,
-    borderColor: Config.Colors.themeColor,
-  },
-  optionText: {
-    fontSize: widthToDp(3.2),
-    color: Config.Colors.black,
-  },
-  selectedOptionText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-   errorText: {
+  errorText: {
     color: 'red',
     fontSize: widthToDp(3),
     marginTop: heightToDp(0.5),
@@ -878,7 +926,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontFamily: Config.fontFamilys.Poppins_Medium,
   },
-  optionWrapper: width => ({
+  optionWrapper: (width: number) => ({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: widthToDp(2),
@@ -894,19 +942,28 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
   },
 });
-
+ 
 const custyles = StyleSheet.create({
-  dropdown: {
-    height: widthToDp(12),
-    width: widthToDp(25),
-    backgroundColor: Config.Colors.inputField_1,
-    borderRadius: widthToDp(1),
-    paddingHorizontal: 8,
+  placeholderStyle: {
+    fontSize: 16,
+    color: Config.Colors.black,
   },
   selectedTextStyle: {
     color: Config?.Colors?.textColor?.textColor_2,
     fontFamily: Config?.fontFamilys?.Poppins_SemiBold,
     fontWeight: Config?.WEIGHTS?.medium,
     fontSize: 17,
+  },
+  imageStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
   },
 });

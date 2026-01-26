@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { memo, useRef, useState } from 'react';
 import {
   View,
   Image,
@@ -8,24 +8,36 @@ import {
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  ListRenderItemInfo,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Config from '../../../../helpers/Config';
-
+ 
 const { width } = Dimensions.get('window');
-
-const BannerCarousel = ({ banners }) => {
+ 
+type BannerItem = {
+  filename?: string;
+  title?: string;
+};
+ 
+type BannerCarouselProps = {
+  banners?: BannerItem[];
+};
+ 
+const BannerCarousel: React.FC<BannerCarouselProps> = ({ banners = [] }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const flatListRef = useRef(null);
-
-  const onScroll = event => {
+  const flatListRef = useRef<FlatList<BannerItem> | null>(null);
+ 
+  const onScroll = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ): void => {
     const slideIndex = Math.round(
       event.nativeEvent.contentOffset.x / (width - 40),
     );
     setActiveIndex(slideIndex);
   };
-
-  const renderItem = ({ item }) => (
+ 
+  const renderItem = ({ item }: ListRenderItemInfo<BannerItem>) => (
     <View style={styles.slideWrapper}>
       <View style={styles.slide}>
         <Image
@@ -48,7 +60,7 @@ const BannerCarousel = ({ banners }) => {
       </View>
     </View>
   );
-
+ 
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -56,11 +68,11 @@ const BannerCarousel = ({ banners }) => {
         <Text style={styles.heading}>Featured</Text>
         <View style={styles.indicator}>
           <Text style={styles.indicatorText}>
-            {activeIndex + 1} / {banners?.length || 0}
+            {activeIndex + 1} / {banners.length}
           </Text>
         </View>
       </View>
-
+ 
       {/* FlatList Carousel */}
       <FlatList
         ref={flatListRef}
@@ -68,7 +80,7 @@ const BannerCarousel = ({ banners }) => {
         renderItem={renderItem}
         horizontal
         pagingEnabled
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(_, index) => index.toString()}
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -80,7 +92,7 @@ const BannerCarousel = ({ banners }) => {
     </View>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#F8FAFC',
@@ -179,5 +191,5 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
 });
-
-export default React.memo(BannerCarousel);
+ 
+export default memo(BannerCarousel);

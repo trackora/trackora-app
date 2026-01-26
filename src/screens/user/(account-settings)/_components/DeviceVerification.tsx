@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Modal,
-  TextInput,
+  ListRenderItemInfo,
 } from 'react-native';
 import { Header_2 } from '../../../../components/Header';
 import * as Icons from '../../../../helpers/Icons';
@@ -15,39 +14,44 @@ import { heightToDp, widthToDp } from '../../../../helpers/Responsive';
 import { apiPostService } from '../../../../helpers/services';
 import * as Constants from '../../../../helpers/Constants';
 import { isApiSuccess } from '../../../../helpers/Validation';
-import DeviceInfo from 'react-native-device-info';
-import axios from 'axios';
-import { logCurl } from '../../../../helpers/utils';
-import { getData } from '../../../../helpers/localStorage';
-
-const DeviceVerification = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('pending');
-  const [deviceData, setDeviceData] = useState({});
-
+ 
+type DeviceItem = {
+  id?: number | string;
+  user_name?: string;
+  device_name?: string;
+  device_os?: string;
+  device_id?: string;
+};
+ 
+type DeviceList = {
+  count?: number;
+  data?: DeviceItem[];
+};
+ 
+type DeviceData = {
+  pending?: DeviceList;
+  verified?: DeviceList;
+};
+ 
+type DeviceVerificationProps = {
+  navigation: {
+    goBack: () => void;
+  };
+};
+ 
+const DeviceVerification: React.FC<DeviceVerificationProps> = ({
+  navigation,
+}) => {
+  const [activeTab, setActiveTab] = useState<'pending' | 'verified'>('pending');
+  const [deviceData, setDeviceData] = useState<DeviceData>({});
+ 
   const goBackScreen = () => navigation.goBack();
-
-const renderDeviceItem = ({ item }) => (
-  <View style={styles.deviceCard}>
-    {item?.user_name && (
-      <Text style={styles.userName}>{item?.user_name}</Text>
-    )}
-    <Text style={styles.deviceName}>{item?.device_name}</Text>
-    <Text style={styles.deviceInfo}>OS: {item?.device_os}</Text>
-    <Text style={styles.deviceInfo}>ID: {item?.device_id}</Text>
-    {activeTab === 'pending' && (
-      <TouchableOpacity
-        style={styles.approveButton}
-        onPress={() => handleApprove(item?.id)}
-      >
-        <Text style={styles.approveButtonText}>Approve this</Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
-  const handleApprove = async deviceId => {
+ 
+  const handleApprove = async (deviceId?: number | string) => {
     try {
+      if (!deviceId) return;
       const bodyData = { status: 1, id: deviceId };
-      const apiData = await apiPostService(
+      const apiData: any = await apiPostService(
         Constants?.approveDeviceApi,
         bodyData,
       );
@@ -56,10 +60,10 @@ const renderDeviceItem = ({ item }) => (
       console.log('Error approving device:', err);
     }
   };
-
+ 
   const handleDeviceList = async () => {
     try {
-      let apiData = await apiPostService(Constants?.getAllDeviceApi, {
+      const apiData: any = await apiPostService(Constants?.getAllDeviceApi, {
         filter: {},
       });
       if (isApiSuccess(apiData)) setDeviceData(apiData?.data?.result);
@@ -67,16 +71,35 @@ const renderDeviceItem = ({ item }) => (
       console.log('Error occured while getting device list', err);
     }
   };
-
-  React.useEffect(() => {
+ 
+  useEffect(() => {
     handleDeviceList();
   }, []);
-
+ 
+  const renderDeviceItem = ({ item }: ListRenderItemInfo<DeviceItem>) => (
+    <View style={styles.deviceCard}>
+      {item?.user_name && (
+        <Text style={styles.userName}>{item?.user_name}</Text>
+      )}
+      <Text style={styles.deviceName}>{item?.device_name}</Text>
+      <Text style={styles.deviceInfo}>OS: {item?.device_os}</Text>
+      <Text style={styles.deviceInfo}>ID: {item?.device_id}</Text>
+      {activeTab === 'pending' && (
+        <TouchableOpacity
+          style={styles.approveButton}
+          onPress={() => handleApprove(item?.id)}
+        >
+          <Text style={styles.approveButtonText}>Approve this</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+ 
   const currentData =
     activeTab === 'pending'
       ? deviceData?.pending?.data
       : deviceData?.verified?.data;
-
+ 
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -88,7 +111,7 @@ const renderDeviceItem = ({ item }) => (
         animated={true}
         onPressLeft={goBackScreen}
       />
-
+ 
       {/* Tabs */}
       <View style={styles.toggleContainer}>
         <TouchableOpacity
@@ -107,7 +130,7 @@ const renderDeviceItem = ({ item }) => (
             Pending ({deviceData?.pending?.count})
           </Text>
         </TouchableOpacity>
-
+ 
         <TouchableOpacity
           style={[
             styles.toggleButton,
@@ -125,11 +148,11 @@ const renderDeviceItem = ({ item }) => (
           </Text>
         </TouchableOpacity>
       </View>
-
+ 
       {/* Device list */}
       <FlatList
-        data={currentData}
-        keyExtractor={item => item?.id?.toString()}
+        data={currentData ?? []}
+        keyExtractor={item => String(item?.id ?? '')}
         renderItem={renderDeviceItem}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
@@ -139,9 +162,9 @@ const renderDeviceItem = ({ item }) => (
     </View>
   );
 };
-
-export default React.memo(DeviceVerification);
-
+ 
+export default memo(DeviceVerification);
+ 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   toggleContainer: {
@@ -159,7 +182,7 @@ const styles = StyleSheet.create({
   activeToggle: { backgroundColor: Config.Colors.themeColor },
   toggleText: { fontSize: 14, fontWeight: '600', color: '#555' },
   activeToggleText: { color: '#fff' },
- deviceCard: {
+  deviceCard: {
     padding: 16,
     marginHorizontal: 16,
     marginVertical: 8,
@@ -176,7 +199,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 16,
     fontWeight: '700',
-    color: Config.Colors.themeColor, // standout color
+    color: Config.Colors.themeColor,
     marginBottom: 6,
   },
   deviceName: {

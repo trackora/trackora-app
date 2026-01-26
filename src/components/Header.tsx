@@ -55,6 +55,28 @@ export const Header_1 = ({ text = '' }) => {
   );
 };
 
+type Header2Props = {
+  leftImage?: any;
+  rightImage?: any;
+  onPressRight?: () => void;
+  svg?: boolean;
+  svgLeft?: boolean;
+  commonWidth?: number;
+  commonHeight?: number;
+  leftText?: any;
+  animated?: boolean;
+  tintColorLeft?: string;
+  tintColorRight?: string;
+  onPressLeft?: () => void;
+  rightImageTopText?: string;
+  filterBranch?: boolean | null;
+  branchData?: any[];
+  handleDropDown?: (item: any) => void;
+  dropDowninitial?: string;
+  helpIcon?: any;
+  helpIconTintColor?: string;
+  onPresshelpIcon?: () => void;
+};
 export const Header_2 = ({
   leftImage,
   rightImage,
@@ -76,7 +98,7 @@ export const Header_2 = ({
   helpIcon,
   helpIconTintColor,
   onPresshelpIcon,
-}) => {
+}:Header2Props) => {
   const { t } = useTranslation();
   return (
     <View

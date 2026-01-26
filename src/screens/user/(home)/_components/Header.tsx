@@ -1,23 +1,37 @@
 'use client';
-
+ 
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
-
+ 
 import { apiPostService } from '../../../../helpers/services';
 import { isApiSuccess } from '../../../../helpers/Validation';
 import * as Constants from '../../../../helpers/Constants';
 import * as Config from '../../../../helpers/Config';
-
-const Header = ({ navigation }) => {
-  const loginData = useSelector(state => state.login?.data?.loginData?.data);
+ 
+type LoginData = {
+  name?: string;
+  designation?: string;
+};
+ 
+type HeaderProps = {
+  navigation: {
+    navigate: (screen: string, params?: { notificationCount: number }) => void;
+  };
+};
+ 
+const Header: React.FC<HeaderProps> = ({ navigation }) => {
+  const loginData = useSelector(
+    (state: any) => state.login?.data?.loginData?.data,
+  ) as LoginData | undefined;
+ 
   const [notificationCount, setNotificationCount] = React.useState(0);
-
+ 
   const getNotificationCount = React.useCallback(async () => {
     try {
       const bodyData = { limit: 20, start: 0, filter: {} };
-      const apiData = await apiPostService(
+      const apiData: any = await apiPostService(
         Constants?.get_unread_notification_count_api,
         bodyData,
       );
@@ -28,11 +42,11 @@ const Header = ({ navigation }) => {
       console.log('Error fetching notifications:', err);
     }
   }, []);
-
+ 
   React.useEffect(() => {
     getNotificationCount();
-  }, []);
-
+  }, [getNotificationCount]);
+ 
   return (
     <LinearGradient
       colors={['#F8FAFC', '#E2E8F0']}
@@ -58,7 +72,7 @@ const Header = ({ navigation }) => {
             </Text>
           </View>
         </View>
-
+ 
         <TouchableOpacity
           style={styles.notificationContainer}
           onPress={() =>
@@ -85,7 +99,7 @@ const Header = ({ navigation }) => {
     </LinearGradient>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     padding: 15,
@@ -175,5 +189,5 @@ const styles = StyleSheet.create({
     fontFamily: Config.fontFamilys.Poppins_Bold,
   },
 });
-
+ 
 export default React.memo(Header);

@@ -1,10 +1,28 @@
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Config from '../../../../helpers/Config';
-
-const AttendanceSection = ({ attendData }) => {
+ 
+type AttendanceTimes = {
+  start_time?: string;
+  stop_time?: string;
+  break_time?: string;
+  total_time?: string;
+};
+ 
+type AttendanceData = {
+  date?: string;
+  text?: string;
+  data: AttendanceTimes;
+};
+ 
+type AttendanceSectionProps = {
+  attendData: AttendanceData;
+};
+ 
+const AttendanceSection: React.FC<AttendanceSectionProps> = ({ attendData }) => {
   const { date, text, data } = attendData;
-
+ 
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -28,7 +46,7 @@ const AttendanceSection = ({ attendData }) => {
             </LinearGradient>
           </View>
         </View>
-
+ 
         {/* Time Grid */}
         <View style={styles.timeGrid}>
           <View style={styles.timeCard}>
@@ -41,7 +59,7 @@ const AttendanceSection = ({ attendData }) => {
             <Text style={styles.timeLabel}>Punch In</Text>
             <Text style={styles.timeValue}>{data.start_time || '--:--'}</Text>
           </View>
-
+ 
           <View style={styles.timeCard}>
             <LinearGradient
               colors={['#DC2626', '#EF4444']}
@@ -53,7 +71,7 @@ const AttendanceSection = ({ attendData }) => {
             <Text style={styles.timeValue}>{data.stop_time || '--:--'}</Text>
           </View>
         </View>
-
+ 
         <View style={styles.timeGrid}>
           <View style={styles.timeCard}>
             <LinearGradient
@@ -65,7 +83,7 @@ const AttendanceSection = ({ attendData }) => {
             <Text style={styles.timeLabel}>Break</Text>
             <Text style={styles.timeValue}>{data.break_time || '--:--'}</Text>
           </View>
-
+ 
           <View style={styles.timeCard}>
             <LinearGradient
               colors={['#059669', '#10B981']}
@@ -77,7 +95,7 @@ const AttendanceSection = ({ attendData }) => {
             <Text style={styles.timeValue}>{data.total_time || '--:--'}</Text>
           </View>
         </View>
-
+ 
         {/* Action Button */}
         <TouchableOpacity style={styles.buttonContainer}>
           <LinearGradient
@@ -94,7 +112,7 @@ const AttendanceSection = ({ attendData }) => {
     </View>
   );
 };
-
+ 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
@@ -204,5 +222,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.3)',
   },
 });
-
+ 
 export default AttendanceSection;

@@ -1,20 +1,19 @@
+import React, { useRef } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Image,
-  ScrollView,
   FlatList,
   ActivityIndicator,
+  ListRenderItemInfo,
 } from 'react-native';
-import React, { useRef } from 'react';
-import { Header_1, Header_2, Header_3 } from '../../components/Header';
 import * as Icons from '../../helpers/Icons';
 import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { handleCamera, toLocaleDateString } from '../../helpers/utils';
 import { apiPostService } from '../../helpers/services';
 import { useFocusEffect } from '@react-navigation/native';
@@ -22,50 +21,63 @@ import { CustomInputBox } from '../../components/CustomElements';
 import CustomModal from '../../components/CustomModal';
 import CustomImageVIew from './CustomImageVIew';
 import { useTranslation } from 'react-i18next';
-
-const TodayNotes = ({ navigation, route }) => {
-  const [chatMessage, setChatMessage] = React.useState([]);
+ 
+type RootState = {
+  login?: any;
+};
+ 
+type ChatMessage = {
+  id?: number | string;
+  text?: string;
+  filename?: string;
+  created_on?: string | number | Date;
+};
+ 
+type TodayNotesProps = {
+  navigation: any;
+  route: any;
+};
+ 
+const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
+  const [chatMessage, setChatMessage] = React.useState<ChatMessage[]>([]);
   const [message, setMessage] = React.useState('');
   const [openModal, setOpenModal] = React.useState(false);
-  const getTokenData = useSelector(state => state.login);
+  const getTokenData = useSelector((state: RootState) => state.login);
   const [fullImage, setFullImage] = React.useState(false);
   const [imagePath, setImagePath] = React.useState('');
   const [pageLoader, setPageLoader] = React.useState(false);
   const { t } = useTranslation();
-  const flatListRef = useRef(null);
-  const handelFullImage = img => {
+  const flatListRef = useRef<FlatList<ChatMessage> | null>(null);
+ 
+  const handelFullImage = (img: string) => {
     setFullImage(true);
     setImagePath(img);
   };
+ 
   const getMessage = async () => {
-    // let bodyData = {
-    //     start: 0,
-    //     limit: 100000,
-    //     filter: {
-    //         "search": ""
-    //     },
-    // }
     setPageLoader(true);
-    let bodyData = {
+    const bodyData = {
       limit: 50,
       start: 0,
       user_id: getTokenData?.data?.loginData?.id,
       filter: {},
     };
     const apiData = await apiPostService(Constants?.notes_list_api, bodyData);
-    if (apiData?.data?.result.data) {
+    if (apiData?.data?.result?.data) {
       setPageLoader(false);
-      return setChatMessage(apiData?.data?.result.data);
+      return setChatMessage(apiData?.data?.result?.data);
     }
+    setPageLoader(false);
   };
+ 
   const sendMessage = async () => {
-    let chatBodyData = {
+    const chatBodyData = {
       user_id: getTokenData?.data?.loginData?.id,
       username: getTokenData?.data?.loginData?.name,
       text: message,
       filename: '',
     };
-    let chatApiRes = await apiPostService(
+    const chatApiRes = await apiPostService(
       Constants?.add_notes_api,
       chatBodyData,
     );
@@ -74,26 +86,27 @@ const TodayNotes = ({ navigation, route }) => {
       setMessage('');
     }
   };
-  const uploadDoc = async type => {
+ 
+  const uploadDoc = async (type?: string) => {
     const mediaData = await handleCamera('photo', type);
-    let bodyData = {
+    const bodyData = {
       appType: 'sfa',
-      base64: `data:image/jpeg;base64,${mediaData?.data}`,
+      base64: `data:image/jpeg;base64,${mediaData?.data ?? ''}`,
     };
     setOpenModal(false);
     if (bodyData) {
-      let apiData = await apiPostService(
+      const apiData = await apiPostService(
         Constants?.base64_to_file_api,
         bodyData,
       );
       if (apiData?.data?.status === 'success') {
-        let chatBodyData = {
+        const chatBodyData = {
           user_id: getTokenData?.data?.loginData?.id,
           username: getTokenData?.data?.loginData?.name,
           text: message,
           filename: 'uploads/2023-07/1789438732834.jpeg',
         };
-        let chatApiRes = await apiPostService(
+        const chatApiRes = await apiPostService(
           Constants?.add_notes_api,
           chatBodyData,
         );
@@ -101,23 +114,30 @@ const TodayNotes = ({ navigation, route }) => {
           getMessage();
           setMessage('');
         }
-        // apiData?.data?.response;
-        // Location,fileName,uploadPath
       }
     }
   };
+ 
   useFocusEffect(
     React.useCallback(() => {
       getMessage();
     }, []),
   );
-  // const scrollToBottom = () => {
-  //     flatListRef.current.scrollToEnd();
-  // };
-  const keyExtractor = React.useCallback((item, index) => String(index), []);
-  const renderItemMessage = ({ item, index }) => {
+ 
+  const keyExtractor = React.useCallback(
+    (item: ChatMessage, index: number) => String(item?.id ?? index),
+    [],
+  );
+ 
+  const renderItemMessage = ({
+    item,
+  }: ListRenderItemInfo<ChatMessage>) => {
+    const formattedDate = toLocaleDateString(
+      item?.created_on ?? new Date(),
+    ) as { customDateTime?: string };
+ 
     return (
-      <View style={{ width: '100%' }} key={index}>
+      <View style={{ width: '100%' }}>
         <View style={{ alignItems: 'flex-end', paddingRight: 10, gap: 10 }}>
           <View style={{ padding: 10 }}>
             <View
@@ -128,7 +148,7 @@ const TodayNotes = ({ navigation, route }) => {
               }}
             >
               <Text style={{ color: Config.Colors.defaultColor }}>
-                {toLocaleDateString(item.created_on).customDateTime}
+                {formattedDate?.customDateTime}
               </Text>
               <Text
                 style={{
@@ -165,6 +185,7 @@ const TodayNotes = ({ navigation, route }) => {
       </View>
     );
   };
+ 
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, width: '100%', height: '100%', marginTop: 10 }}>
@@ -172,22 +193,20 @@ const TodayNotes = ({ navigation, route }) => {
           {chatMessage.length ? (
             <FlatList
               refreshing={pageLoader}
-              onRefresh={() => getMessage()}
-              ref={it => (flatListRef.current = it)}
+              onRefresh={getMessage}
+              ref={flatListRef}
               data={chatMessage}
               onContentSizeChange={() =>
                 flatListRef.current?.scrollToEnd({ animated: true })
               }
               extraData={chatMessage}
-              renderItem={item => renderItemMessage(item)}
+              renderItem={renderItemMessage}
               keyExtractor={keyExtractor}
               onEndReachedThreshold={0.1}
               removeClippedSubviews={true}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              style={{
-                marginBottom: 0,
-              }}
+              style={{ marginBottom: 0 }}
             />
           ) : (
             <View
@@ -197,15 +216,20 @@ const TodayNotes = ({ navigation, route }) => {
                 height: '100%',
               }}
             >
-              <ActivityIndicator size={35} color={Config.Colors.textColor} />
+              <ActivityIndicator
+                size={35}
+                color={
+                  Config.Colors.textColor?.textColor_1 ??
+                  Config.Colors.themeColor
+                }
+              />
             </View>
           )}
         </View>
-
+ 
         <View
           style={{
             width: widthToDp(100),
-            // position: 'absolute',
             justifyContent: 'center',
             alignItems: 'flex-end',
             bottom: 0,
@@ -240,10 +264,21 @@ const TodayNotes = ({ navigation, route }) => {
             keyboardType={'default'}
             autoComplete={'cc-csc'}
             commmonBorderRadius={100}
-            // errorMessage={errorMessage?.subject ? errorMessage?.subject : ''}
             borderColor={Config.Colors.themeColor}
-            onChangeText={text => setMessage(text)}
+            onChangeText={(text: string) => setMessage(text)}
             inputValue={message}
+            errorMessage={''}
+            numberOfLines={1}
+            autoCapitalize="none"
+            leftImage={null}
+            tintColor={Config.Colors.themeColor}
+            rightImage={null}
+            commonBackgroundColor={Config.Colors.bodyBg}
+            CommonBorderWidth={1}
+            commonElevation={0}
+            onFocusFunction={() => {}}
+            editable={true}
+            multiline={false}
           />
           <TouchableOpacity
             style={{
@@ -254,8 +289,8 @@ const TodayNotes = ({ navigation, route }) => {
               alignItems: 'center',
               borderRadius: 100,
             }}
-            disabled={message ? false : true}
-            onPress={() => sendMessage()}
+            disabled={!message}
+            onPress={sendMessage}
           >
             <Image
               source={Icons.send_icon}
@@ -264,7 +299,7 @@ const TodayNotes = ({ navigation, route }) => {
             />
           </TouchableOpacity>
         </View>
-
+ 
         <View>
           <CustomModal
             modalVisible={openModal}
@@ -272,7 +307,6 @@ const TodayNotes = ({ navigation, route }) => {
             alignItems="flex-end"
             justifyContent="flex-end"
             disableOnPress={true}
-            showHeader={false}
           >
             <View
               style={{
@@ -343,8 +377,6 @@ const TodayNotes = ({ navigation, route }) => {
               onRequestClose={() => setFullImage(!fullImage)}
               backgroundColor="#000"
               transparent={false}
-              showHeader={true}
-              headerText=""
             >
               <CustomImageVIew
                 handleFullImage={() => setFullImage(!fullImage)}
@@ -357,12 +389,10 @@ const TodayNotes = ({ navigation, route }) => {
     </View>
   );
 };
+ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: 'center',
-    // width:widthToDp(90),
-    // backgroundColor:'#000'
   },
   body: {
     marginTop: 10,
@@ -380,7 +410,6 @@ const styles = StyleSheet.create({
   },
   boxContainer: {
     alignSelf: 'center',
-    // bottom: 10
   },
   boxContainerIner: {
     marginBottom: widthToDp(16),
@@ -398,4 +427,5 @@ const styles = StyleSheet.create({
     padding: widthToDp(2),
   },
 });
+ 
 export default React.memo(TodayNotes);
