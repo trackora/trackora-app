@@ -15,13 +15,13 @@ import BottomSheet from '../../animated/BottomSheet';
 import CustomModal from '../../components/CustomModal';
 import { CustomButton, CustomInput, CustomLinearButton } from '../../components/CustomElements';
 import CustomCheckBox from '../../components/CustomCheckBox';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 let notification_type = []
 let userIds = []
 const AdminNotification = ({ navigation, route }) => {
-  const adminData = useSelector(state => state.admin);
+  const adminData = useAppSelector(state => state.admin);
   const [notificationData, setNotificationData] = React.useState(null)
   const [notificationType, setNotificationType] = React.useState(null)
   const [isModalVisible, setModalVisible] = React.useState(false)
@@ -95,7 +95,7 @@ const AdminNotification = ({ navigation, route }) => {
   }
   useFocusEffect(
     React.useCallback(() => {
-      getNotification();
+      getNotification(undefined);
     }, [])
   );
   const handleReadNotification = async (item) => {
@@ -105,7 +105,7 @@ const AdminNotification = ({ navigation, route }) => {
       }
       const apiData = await apiPostService(Constants?.mark_read_notification_api, bodyData);
       if (apiData?.data.status === 'success') {
-        await getNotification();
+        await getNotification(undefined);
       }
     }
     else {
@@ -134,7 +134,8 @@ const AdminNotification = ({ navigation, route }) => {
       }
     }
   }
-  const renderNotificationItem = React.useCallback(({ item }, checkDateType) => {
+  const renderNotificationItem = React.useCallback(({ item }: { item: any }) => {
+    const checkDateType = toLocaleDateString(item?.created_on)?.customValTimeString ?? '';
     return (
       <View >
         <View style={{}}>
@@ -194,7 +195,7 @@ const AdminNotification = ({ navigation, route }) => {
   const ListFooterComponent = () => {
     return (
       <TouchableOpacity style={{ marginBottom: heightToDp(10), marginTop: 20 }}>
-        {loading ? <ActivityIndicator size={35} color={Config.Colors.textColor} /> : null}
+        {loading ? <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} /> : null}
       </TouchableOpacity>
     )
   }
@@ -274,13 +275,17 @@ const AdminNotification = ({ navigation, route }) => {
           <View style={{}}>
             {type === "usersList" ?
               <CustomCheckBox
-                handleOptionPress={(name) => handleOptionPress(item?.id, "usersList")}
+                checkButtonText={item?.name}
+                index={0}
+                handleOptionPress={(_name, _val, _idx) => handleOptionPress(item?.id, "usersList")}
                 checkBoxValue={item?.name}
                 flexDirection={"column"}
                 alignItems={"flex-end"}
               /> :
               <CustomCheckBox
-                handleOptionPress={(name) => handleOptionPress(name, "notification_type")}
+                checkButtonText={item?.name}
+                index={0}
+                handleOptionPress={(name, _val, _idx) => handleOptionPress(name, "notification_type")}
                 checkBoxValue={item?.name}
                 flexDirection={"column"}
                 alignItems={"flex-end"}
@@ -353,19 +358,16 @@ const AdminNotification = ({ navigation, route }) => {
           {notificationData ?
             <FlatList
               refreshing={loading}
-              onRefresh={getNotification}
-              data={notificationData}
-              keyExtractor={(item, index) => item + index}
+              onRefresh={() => getNotification(undefined)}
+              data={notificationData ?? []}
+              keyExtractor={(item: any, index: number) => String(item?.id ?? index)}
               renderItem={renderNotificationItem}
               showsVerticalScrollIndicator={false}
-              // renderSectionHeader={({ section: { title } }) => (
-              //   <Text style={styles.header}>{title}</Text>
-              // )}
               contentContainerStyle={{
                 paddingBottom: 80
               }}
-              ListFooterComponent={ListFooterComponent}
-              onEndReached={handleMoreData}
+              ListFooterComponent={ListFooterComponent as any}
+              onEndReached={handleMoreData as any}
             /> :
             loading ?
               <View style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', }}>
@@ -421,7 +423,7 @@ const AdminNotification = ({ navigation, route }) => {
                   >
                     <View style={{}}>
                       <CustomInput
-                        commonWidth={"100%"}
+                        commonWidth={widthToDp(100)}
                         onChangeText={(text) => console.log("first")}
                         // value={empName}
                         placeholder={t(Config.employeelistText?.search_emp)}
@@ -449,6 +451,8 @@ const AdminNotification = ({ navigation, route }) => {
                         <Text style={{ color: Config.Colors.textColor.textColor_2, fontSize: widthToDp(4), fontFamily: Config.fontFamilys.Poppins_Medium }}>{t(Config.notification_text?.select_all_emp)}</Text>
                         <View style={{}}>
                           <CustomCheckBox
+                            checkButtonText={t(Config.notification_text?.all)}
+                            index={0}
                             handleOptionPress={(item) => handleOptionPress(item, "all")}
                             checkBoxValue={t(Config.notification_text?.all)}
                             flexDirection={"column"}
@@ -459,7 +463,7 @@ const AdminNotification = ({ navigation, route }) => {
                       <View style={{ height: widthToDp(70) }}>
                         <FlatList
                           data={adminData?.data?.usersList?.data}
-                          renderItem={(item, index) => <RenderEmpItem item={item} index={index} type={"usersList"} />}
+                          renderItem={({ item, index }) => <RenderEmpItem item={item} index={index} type={"usersList"} />}
                           extraData={adminData?.data?.usersList?.data}
                           keyExtractor={(item, index) => String(index)}
                           showsVerticalScrollIndicator={false}
@@ -477,7 +481,7 @@ const AdminNotification = ({ navigation, route }) => {
                         <CustomLinearButton
                           commonWidth={widthToDp(80)}
                           text={t(Config.employeelistText?.apply)}
-                          onPress={getNotification}
+                          onPress={() => getNotification(undefined)}
                           color={Config.Colors.defaultColor}
                           borderRadius={10}
                         />
@@ -525,7 +529,7 @@ const AdminNotification = ({ navigation, route }) => {
                       <View style={{ height: widthToDp(90) }}>
                         <FlatList
                           data={notificationType}
-                          renderItem={(item, index) => <RenderEmpItem item={item} index={index} type={""} />}
+                          renderItem={({ item, index }) => <RenderEmpItem item={item} index={index} type={""} />}
                           extraData={notificationType}
                           keyExtractor={(item, index) => String(index)}
                           showsVerticalScrollIndicator={false}

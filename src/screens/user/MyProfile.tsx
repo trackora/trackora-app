@@ -13,7 +13,8 @@ import * as Icons from '../../helpers/Icons';
 import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiPostService, getProfileData } from '../../helpers/services';
 import { login } from '../../redux/slices/login.slice';
@@ -26,7 +27,7 @@ import { isApiSuccess } from '../../helpers/Validation';
 
 const MyProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const getTokenData = useSelector(state => state.login);
+  const getTokenData = useAppSelector(state => state.login);
   const [openModal, setOpenModal] = React.useState(false);
   const [imgLoader, setImgLoader] = React.useState(false);
   const [fullImage, setFullImage] = React.useState(false);

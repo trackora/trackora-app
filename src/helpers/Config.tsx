@@ -66,6 +66,10 @@ export const Colors = {
   successField: '#F5FFEA',
   successText: '#6FB423',
   defaultColor: '#FFF',
+  white: '#FFFFFF',
+  offWite: '#F8F8F8',
+  offWhite: '#F8F8F8',
+  attendenceIcon: '#3085FE',
   lineColor: '#3085FE',
   inputField_1: '#E4E4E4',
   themeColor: '#3085FE',
@@ -267,6 +271,8 @@ export const userSalaryDetailsHeader = [
     textColor: '',
   },
 ];
+
+export const menuArray: { heading: string; items: unknown[] }[] = [];
 
 // export const menuArray = [
 //   {

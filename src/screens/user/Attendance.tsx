@@ -97,7 +97,7 @@ const Attendance = ({ navigation }) => {
         ...apiData.data.data,
         detail: tempData,
       };
-      setAttendanceData(apiData);
+      setAttendanceData(apiData as any);
     }
   };
 
@@ -127,7 +127,7 @@ const Attendance = ({ navigation }) => {
       const onPress = () => {
         if (filter === item?.name) {
           setFilter('');
-          handleAttendanceList();
+          handleAttendanceList(undefined);
         } else {
           setFilter(item?.name);
           handleAttendanceList({ date: month, search: item?.name });
@@ -317,7 +317,6 @@ const Attendance = ({ navigation }) => {
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            justifyContent: 'center',
             marginTop: widthToDp(2),
             marginBottom: widthToDp(3),
           }}
@@ -331,12 +330,8 @@ const Attendance = ({ navigation }) => {
               }}
             >
               <SvgCalender
-                source={Icons.calendar_icon}
-                style={{
-                  width: widthToDp(6),
-                  height: heightToDp(2.5),
-                  tintColor: Config.Colors.themeColor,
-                }}
+                width={widthToDp(6)}
+                height={heightToDp(2.5)}
               />
               <Text
                 style={{ fontSize: widthToDp(3.5), color: Config.Colors.black }}
@@ -362,7 +357,7 @@ const Attendance = ({ navigation }) => {
             <FlatList
               data={normalizedData?.detail}
               renderItem={renderItem}
-              extraData={normalizedData?.data?.attendanceV2List?.detail}
+              extraData={(normalizedData as any)?.data?.attendanceV2List?.detail}
               keyExtractor={(item, index) => String(index)}
               showsVerticalScrollIndicator={false}
               horizontal

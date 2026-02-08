@@ -16,7 +16,8 @@ import * as Constants from '../../helpers/Constants';
 import * as Svgs from '../../helpers/Svg';
 import { SvgCalender } from '../../helpers/Svg';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { clearAll } from '../../helpers/localStorage';
 import RNRestart from 'react-native-restart';
 import { toLocaleDateString } from '../../helpers/utils';
@@ -33,7 +34,7 @@ import { isApiSuccess } from '../../helpers/Validation';
 
 const Menus = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const selectedLanguage = useSelector(
+  const selectedLanguage = useAppSelector(
     state => state?.user?.currentAppLanguage,
   );
   const [notificationCount, setNotificationCount] = React.useState(null);
@@ -233,8 +234,8 @@ const Menus = ({ navigation, route }) => {
   };
 
   // Change language
-  const handleChangeLanguage = item => {
-    setOpenModal(changeLanguage(item));
+  const handleChangeLanguage = (item: { code?: string }) => {
+    changeLanguage(item).then(() => setOpenModal(false));
   };
 
   const renderLanguage = ({ item }) => {

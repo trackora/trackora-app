@@ -20,7 +20,8 @@ import * as Icons from '../../helpers/Icons';
 import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import {
   handleCamera,
   requestBackgroundPermission,
@@ -58,14 +59,14 @@ const Chat = ({ navigation, route }) => {
   const [chatMessage, setChatMessage] = React.useState([]);
   const [message, setMessage] = React.useState('');
   const [openModal, setOpenModal] = React.useState(false);
-  const getTokenData = useSelector(state => state.login);
+  const getTokenData = useAppSelector(state => state.login);
   const [fullImage, setFullImage] = React.useState(false);
   const [imagePath, setImagePath] = React.useState('');
   const [pageLoader, setPageLoader] = React.useState(false);
   const [startRecding, setStartRecding] = React.useState(false);
   const [recordingPath, setRecordingPath] = React.useState(null);
-  const [pauseRecoding, setPauseRecoding] = React.useState('');
-  const [playRecoding, setPlayRecoding] = React.useState('');
+  const [pauseRecoding, setPauseRecoding] = React.useState(false);
+  const [playRecoding, setPlayRecoding] = React.useState(false);
   const [imageLoader, setImageLoader] = React.useState(false);
   const [voiceLoader, setVoiceLoader] = React.useState(false);
   const [base64, setBase64] = React.useState('');
@@ -505,7 +506,7 @@ const Chat = ({ navigation, route }) => {
                   >
                     <ActivityIndicator
                       size={35}
-                      color={Config.Colors.textColor}
+                      color={Config.Colors.textColor.textColor_1}
                     />
                   </View>
                 ) : null}
@@ -602,7 +603,7 @@ const Chat = ({ navigation, route }) => {
             />
           ) : pageLoader ? (
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-              <ActivityIndicator size={35} color={Config.Colors.textColor} />
+              <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
             </View>
           ) : (
             <View
@@ -873,7 +874,7 @@ const Chat = ({ navigation, route }) => {
                 <View style={{ gap: widthToDp(2), marginTop: widthToDp(3) }}>
                   <TouchableOpacity
                     style={{ flexDirection: 'row', gap: widthToDp(2) }}
-                    onPress={() => uploadDoc()}
+                    onPress={() => uploadDoc('openPicker')}
                   >
                     <Image
                       source={Icons?.gallery_icon}

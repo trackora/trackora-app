@@ -1,21 +1,23 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
+    "module": "commonjs",
+    "lib": ["es2019", "dom"],
     "jsx": "react-native",
     "strict": false,
-    "noImplicitAny": true,
-    "moduleResolution": "node",
-    "allowJs": true,
-    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "checkJs": false,
     "skipLibCheck": true,
+    "allowJs": true,
+    "isolatedModules": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "App.tsx", "index.ts"],
-  "exclude": ["node_modules"],
-   "extends": "@tsconfig/react-native/tsconfig.json",
+  "include": ["src/**/*", "index.web.tsx"],
+  "exclude": ["node_modules"]
 }

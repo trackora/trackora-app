@@ -9,7 +9,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { apiPostService } from '../../helpers/services';
 import { CustomButton, CustomDropDownComponent, CustomInputBox } from '../../components/CustomElements';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { usersList } from '../../redux/slices/admin.slice';
 import CustomModal from '../../components/CustomModal';
 import RNFS from 'react-native-fs'
@@ -19,8 +20,8 @@ import { useTranslation } from 'react-i18next';
 const Reports = ({ navigation, route }) => {
 
     const dispatch = useDispatch();
-    const userData = useSelector(state => state.login);
-    const adminData = useSelector(state => state.admin);
+    const userData = useAppSelector(state => state.login);
+    const adminData = useAppSelector(state => state.admin);
     const [empName, setEmpName] = React.useState('');
     const [loader, setLoader] = React.useState(false);
     const [alertdata, setAlertdata] = React.useState(null);
@@ -62,7 +63,7 @@ const Reports = ({ navigation, route }) => {
     }
     useFocusEffect(
         React.useCallback(() => {
-            getUsersList();
+            getUsersList(undefined);
         }, [])
     );
     const onChange = (text) => {
@@ -86,7 +87,7 @@ const Reports = ({ navigation, route }) => {
             setStatusValue(null);
             setStatusRemark(null);
             setUserFormModal(false);
-            getUsersList();
+            getUsersList(undefined);
         }
     }
     async function saveCsvFile(csvData, fileName) {
@@ -231,7 +232,7 @@ const Reports = ({ navigation, route }) => {
                         <View style={{ marginTop: 30 }}>
                             {reportViewType === "Reports" ?
                                 <View style={{ height: heightToDp(75) }}>
-                                    <Accordion data={Config.CompanyReports} />
+                                    <Accordion data={(Config.CompanyReports ?? []).map((r: any, i: number) => ({ ...r, id: r.id ?? i }))} />
                                 </View> :
                                 <View style={{
                                     width: "100%",
@@ -384,7 +385,7 @@ const Reports = ({ navigation, route }) => {
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: "center", bottom: heightToDp(2.5) }}>
                                     <CustomInputBox
-                                        commonWidth={'100%'}
+                                        commonWidth={widthToDp(100)}
                                         commonHeight={widthToDp(20)}
                                         placeholder={`${t(Config.report_text?.enter_remark)} *`}
                                         keyboardType={'default'}
@@ -507,6 +508,11 @@ const styles = StyleSheet.create({
         borderRightWidth: 10,
         borderBottomColor: Config.Colors.themeColor,
         borderTopColor: Config.Colors.themeColor
+    },
+    history_header_text: {
+        marginTop: 20,
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
     },
 })
 export default React.memo(Reports);

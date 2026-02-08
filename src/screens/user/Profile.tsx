@@ -14,7 +14,8 @@ import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import { SvgCalender } from '../../helpers/Svg';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import CustomMenu from '../../components/CustomMenu';
 import { useFocusEffect } from '@react-navigation/native';
 import { apiPostService, getProfileData } from '../../helpers/services';
@@ -25,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { isApiSuccess } from '../../helpers/Validation';
 
 const Profile = ({ navigation }) => {
-  const getTokenData = useSelector(state => state.login);
+  const getTokenData = useAppSelector(state => state.login);
   const ref = React.useRef(null);
   const { t } = useTranslation();
 
@@ -163,7 +164,7 @@ const Profile = ({ navigation }) => {
       </View>
     );
   };
-  console.log('getTokenData', getTokenData?.userSalaryData);
+  console.log('getTokenData', (getTokenData as any)?.userSalaryData);
   const renderLayout = ({ item }) => {
     return (
       <View style={styles?.boxContainer}>
@@ -308,7 +309,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: Config.fontFamilys.Poppins_SemiBold,
-    color: Config.Colors.black,
     color: Config.Colors.textColor.textColor_2,
   },
   boxContainer: { alignSelf: 'center', marginBottom: heightToDp(2) },

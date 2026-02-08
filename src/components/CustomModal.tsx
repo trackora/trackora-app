@@ -14,9 +14,10 @@ interface CustomModalProps {
   animationType?: 'none' | 'slide' | 'fade';
   transparent?: boolean;
   modalVisible?: boolean;
-  onRequestClose: () => void | boolean;
+  onRequestClose?: () => void | boolean;
   disableOnPress?: boolean;
   children: ReactNode;
+  style?: object;
   alignItems?: 'center' | 'flex-start' | 'flex-end' | 'stretch';
   justifyContent?:
     | 'center'

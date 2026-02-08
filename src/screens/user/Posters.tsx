@@ -117,7 +117,7 @@ const Posters = ({ navigation }) => {
       const reader = new FileReader();
       reader.onload = async () => {
         const dataUrl = reader.result;
-        const croppedImagebase64String = dataUrl.split(',')[1];
+        const croppedImagebase64String = (typeof dataUrl === 'string' ? dataUrl : '').split(',')[1];
 
         // PESDK.openEditor(require(""))
         const options = {
@@ -146,7 +146,7 @@ const Posters = ({ navigation }) => {
         source={{ uri: item }}
       />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <TouchableOpacity style={styles.shareButton} onPress={``} disabled={loading ? true : false}>
+        <TouchableOpacity style={styles.shareButton} onPress={() => {}} disabled={loading ? true : false}>
           <Text style={{ color: Config.Colors.defaultColor, textAlign: "center", fontSize: 20 }}>{t(Config.posterScreenText?.edit)}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.shareButton} onPress={() => share(item)} disabled={loading && true}>
