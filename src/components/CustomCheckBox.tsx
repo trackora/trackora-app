@@ -6,10 +6,10 @@ import * as Config from '../helpers/Config';
 import { widthToDp } from '../helpers/Responsive';
 // create a component
 const CustomCheckBox = ({
-  checkButtonText,
+  checkButtonText = '',
   handleOptionPress,
   checkBoxValue,
-  index,
+  index = 0,
   disabled = false,
   alignItems = 'center',
   flexDirection = 'row',
@@ -17,8 +17,8 @@ const CustomCheckBox = ({
   const [visibility, setVisibility] = React.useState(false);
   return (
     <View style={{
-      alignItems: alignItems,
-      flexDirection: flexDirection,
+      alignItems: alignItems as 'center' | 'flex-start' | 'flex-end' | 'stretch' | 'baseline',
+      flexDirection: flexDirection as 'row' | 'column' | 'row-reverse' | 'column-reverse',
     }}>
       <CheckBox
         disabled={disabled}
@@ -28,18 +28,9 @@ const CustomCheckBox = ({
           setVisibility(newValue)
         }}
         style={styles.checkBoxStyle}
-        // onCheckColor={{ true: Config.colors.themeBgColor, false: Config.colors.themeBgColor }}
-        // onFillColor={{ true: Config.colors.themeBgColor, false: Config.colors.themeBgColor }}
-        // onTintColor={{ true: Config.colors.themeBgColor, false: Config.colors.themeBgColor }}
         tintColors={{ true: Config.Colors.black, false: Config.Colors.black }}
       />
-      <View
-        // onPress={() => {
-        //   handleOptionPress(checkBoxValue, visibility, index);
-        //   setVisibility(!visibility)
-        // }}
-        style={{ paddingRight: 10 }}
-      >
+      <View style={{ paddingRight: 10 }}>
         <Text style={{ color: Config.Colors.black, fontFamily: Config.fontFamilys.Poppins_Medium }}>{checkButtonText}</Text>
       </View>
     </View>

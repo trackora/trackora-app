@@ -159,7 +159,7 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
         }}
       >
         <CustomCheckBox
-          index={item.key}
+          index={0}
           handleOptionPress={(value: any, newValue: any) =>
             handleEmpChange(item.key, newValue)
           }
@@ -506,36 +506,15 @@ const AddEmployee: React.FC<AddEmployeeProps> = ({
                         </Text>
                       </View>
                       <View>
-                        <FlatList
+                        <FlatList<WeekDayItem>
                           data={[
-                            {
-                              name: t(Config.adminHomeScreenText?.mon),
-                              key: "monday_working",
-                            },
-                            {
-                              name: t(Config.adminHomeScreenText?.tue),
-                              key: "tuesday_working",
-                            },
-                            {
-                              name: t(Config.adminHomeScreenText?.wed),
-                              key: "wednesday_working",
-                            },
-                            {
-                              name: t(Config.adminHomeScreenText?.thu),
-                              key: "thursday_working",
-                            },
-                            {
-                              name: t(Config.adminHomeScreenText?.fri),
-                              key: "friday_working",
-                            },
-                            {
-                              name: t(Config.adminHomeScreenText?.sat),
-                              key: "saturday_working",
-                            },
-                            {
-                              name: t(Config.adminHomeScreenText?.sun),
-                              key: "sunday_working",
-                            },
+                            { name: t(Config.adminHomeScreenText?.mon), key: "monday_working" as keyof EmpFormInputs },
+                            { name: t(Config.adminHomeScreenText?.tue), key: "tuesday_working" as keyof EmpFormInputs },
+                            { name: t(Config.adminHomeScreenText?.wed), key: "wednesday_working" as keyof EmpFormInputs },
+                            { name: t(Config.adminHomeScreenText?.thu), key: "thursday_working" as keyof EmpFormInputs },
+                            { name: t(Config.adminHomeScreenText?.fri), key: "friday_working" as keyof EmpFormInputs },
+                            { name: t(Config.adminHomeScreenText?.sat), key: "saturday_working" as keyof EmpFormInputs },
+                            { name: t(Config.adminHomeScreenText?.sun), key: "sunday_working" as keyof EmpFormInputs },
                           ]}
                           renderItem={renderWeekDays}
                           keyExtractor={(item, index) => String(index)}

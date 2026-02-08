@@ -178,11 +178,8 @@ const CustomMap: React.FC<CustomMapProps> = ({
                 }}
               >
                 <SvgCalender
-                  style={{
-                    width: widthToDp(6),
-                    height: heightToDp(2.5),
-                    tintColor: Config.Colors.themeColor,
-                  }}
+                  width={widthToDp(6)}
+                  height={heightToDp(2.5)}
                 />
                 <Text style={{ color: Config.Colors.black }}>
                   {toLocaleDateString(selectedDate).day_name},{' '}

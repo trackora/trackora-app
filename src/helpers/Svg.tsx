@@ -13,7 +13,6 @@ export const SvgCalender = ({ width, height }: SvgProps) => {
   return (
     <View>
       <Svg
-        xmlns="http://www.w3.org/2000/svg"
         width="40"
         height="20"
         viewBox="0 0 11.7 13"
@@ -77,7 +76,6 @@ export const Lines_1 = () => {
   return (
     <Svg
       id="line_1"
-      xmlns="http://www.w3.org/2000/svg"
       width="300"
       height="100"
       viewBox="0 0 200 50"
@@ -114,7 +112,6 @@ export const Lines_2 = () => {
     <View>
       <Svg
         id="line_1"
-        xmlns="http://www.w3.org/2000/svg"
         width="300"
         height="100"
         viewBox="0 0 200 50"
@@ -150,7 +147,6 @@ export const Lines_2 = () => {
 export const ic_arrow_forward = () => {
   return (
     <Svg
-      xmlns="http://www.w3.org/2000/svg"
       width="10"
       height="10"
       viewBox="0 0 10 10"

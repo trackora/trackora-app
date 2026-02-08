@@ -32,9 +32,11 @@ type ErrorState = {
  
 type MiniMapProps = {
   handleLocation: (location?: BranchLocation | null, radius?: string) => void;
+  onSubmitBtn?: (location?: BranchLocation | null, radius?: string) => void;
+  defaultlocation?: BranchLocation | null;
 };
  
-const MiniMap: React.FC<MiniMapProps> = ({ handleLocation }) => {
+const MiniMap: React.FC<MiniMapProps> = ({ handleLocation, onSubmitBtn, defaultlocation }) => {
   const mapRef = useRef<MapView | null>(null);
   const [liveLocation, setLiveLocation] =
     React.useState<BranchLocation | null>(null);

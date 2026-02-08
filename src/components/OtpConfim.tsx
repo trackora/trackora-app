@@ -69,8 +69,7 @@ const OtpConfim = ({ onChange, backgroundColor, textColor }) => {
     );
 };
 const styles = StyleSheet.create({
-    // root: { padding: 20, minHeight: 300 },
-    // title: { textAlign: 'center', fontSize: 30 },
+    root: { padding: 20, minHeight: 300 },
     fieldRow: {
         // marginTop: 20,
         flexDirection: 'row',

@@ -11,7 +11,8 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { useFocusEffect } from '@react-navigation/native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
@@ -31,9 +32,9 @@ const ContactUs = ({ navigation }: any) => {
   const { t } = useTranslation();
   const mapRef = useRef(null);
 
-  const { data: tokenData } = useSelector(state => state?.login);
+  const { data: tokenData } = useAppSelector(state => state?.login);
 
-  const [mapType, setMapType] = useState('standard');
+  const [mapType, setMapType] = useState<"standard" | "satellite" | "hybrid" | "terrain">('standard');
   const [mapLocation, setMapLocation] = useState({
     latitude: 19.140255162349007,
     longitude: 72.85484531393793,

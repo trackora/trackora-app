@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   PermissionsAndroid,
   Alert,
+  Platform,
 } from 'react-native';
 import React, { useRef } from 'react';
 import { Header_1, Header_2, Header_3 } from '../../components/Header';
@@ -18,7 +19,8 @@ import * as Constants from '../../helpers/Constants';
 import * as Svgs from '../../helpers/Svg';
 import { SvgCalender } from '../../helpers/Svg';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { clearAll } from '../../helpers/localStorage';
 import { toLocaleDateString } from '../../helpers/utils';
 import { apiPostService } from '../../helpers/services';
@@ -38,10 +40,23 @@ import Geolocation from 'react-native-geolocation-service';
 import { useTranslation } from 'react-i18next';
 import { isApiSuccess } from '../../helpers/Validation';
 
+type BranchFormInputs = {
+  branchName: string;
+  radius: string;
+  location: { latitude: number; longitude: number; locationName?: string } | null;
+  id?: string | number;
+};
+type BranchErrorMessage = { branchName?: string; radius?: string; location?: string };
+const initialInput: BranchFormInputs = {
+  branchName: '',
+  radius: '',
+  location: null,
+};
+
 const Branches = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const mapRef = useRef(null);
-  const adminData = useSelector(state => state.admin);
+  const adminData = useAppSelector(state => state.admin);
   const [openModal, setOpenModal] = React.useState(false);
   const [openMapModal, setOpenMapModal] = React.useState(false);
   const [mapLoading, setMapLoading] = React.useState(false);
@@ -53,30 +68,19 @@ const Branches = ({ navigation, route }) => {
   const [isUpdatingState, setisUpdatingState] = React.useState(false);
   const { t } = useTranslation();
 
-  let initialInput = {
-    branchName: '',
-    radius: '',
-    location: null,
-  };
-  const [errorMessage, setErrorMessage] = React.useState(initialInput);
+  const [errorMessage, setErrorMessage] = React.useState<BranchErrorMessage>({});
 
   // For getting current location
-  const getCurrentLocation = event => {
+  const getCurrentLocation = (event?: unknown) => {
     const requestLocationPermission = async () => {
       if (Platform.OS === 'android') {
         try {
-          const granted = await PermissionsAndroid.request(
+          const granted = await PermissionsAndroid.requestMultiple([
             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
             PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-            PermissionsAndroid.PERMISSIONS.INTERNET,
-            {
-              title: t(Config.branchesText?.location_permission),
-              message: t(Config.branchesText?.permission_message),
-              buttonPositive: t(Config.branchesText?.ok),
-              buttonNegative: t(Config.branchesText?.cancel),
-            },
-          );
-          return granted === PermissionsAndroid.RESULTS.GRANTED;
+          ]);
+          const fine = granted[PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION];
+          return fine === PermissionsAndroid.RESULTS.GRANTED;
         } catch (error) {
           console.error('Error requesting location permission:', error);
           return false;
@@ -127,16 +131,16 @@ const Branches = ({ navigation, route }) => {
   };
 
   // For changing fields
-  const handleOnChange = (name, value) => {
+  const handleOnChange = (name: keyof BranchFormInputs, value: string | BranchFormInputs['location']) => {
     setFormInputs(prv => ({ ...prv, [name]: value }));
-    setErrorMessage(null);
+    setErrorMessage({});
   };
 
   // For setting location
-  const handleLocation = (location, radius) => {
+  const handleLocation = (location?: BranchFormInputs['location'], radius?: string) => {
     setOpenMapModal(!openMapModal);
-    setFormInputs(prv => ({ ...prv, radius: radius, location: location }));
-    setErrorMessage(null);
+    setFormInputs(prv => ({ ...prv, radius: radius ?? prv.radius, location: location ?? prv.location }));
+    setErrorMessage({});
   };
 
   // For Adding and Updating Branch
@@ -149,30 +153,15 @@ const Branches = ({ navigation, route }) => {
       setErrorMessage(prv => ({
         ...prv,
         branchName: t(Config.otherText?.required),
-      }));
-      setErrorMessage(prv => ({
-        ...prv,
         radius: t(Config.otherText?.required),
-      }));
-      setErrorMessage(prv => ({
-        ...prv,
         location: t(Config.otherText?.required),
       }));
     } else if (formInputs.radius === '') {
-      setErrorMessage(prv => ({
-        ...prv,
-        radius: t(Config.otherText?.required),
-      }));
+      setErrorMessage(prv => ({ ...prv, radius: t(Config.otherText?.required) }));
     } else if (formInputs.location == null) {
-      setErrorMessage(prv => ({
-        ...prv,
-        location: t(Config.otherText?.required),
-      }));
+      setErrorMessage(prv => ({ ...prv, location: t(Config.otherText?.required) }));
     } else if (formInputs.branchName === '') {
-      setErrorMessage(prv => ({
-        ...prv,
-        branchName: t(Config.otherText?.required),
-      }));
+      setErrorMessage(prv => ({ ...prv, branchName: t(Config.otherText?.required) }));
     } else {
       let bodyData = {};
       let apiData;
@@ -345,21 +334,17 @@ const Branches = ({ navigation, route }) => {
       filter: {},
     };
     let tempData = [];
-    let apiData = await apiPostService(Constants?.branch_list_api, bodyData);
-    if (isApiSuccess(apiData) && apiData?.data?.result?.data) {
-      setBranchData(apiData?.data?.result?.data);
-      apiData?.data?.result?.data.forEach(element => {
+    const apiResponse = await apiPostService(Constants?.branch_list_api, bodyData);
+    if (isApiSuccess(apiResponse) && apiResponse?.data?.result?.data) {
+      setBranchData(apiResponse.data.result.data);
+      apiResponse.data.result.data.forEach((element: { branch_name?: string; id?: string | number }) => {
         tempData.push({
           label: element?.branch_name,
           value: element?.branch_name,
           id: element?.id,
         });
       });
-      apiData = {
-        branches: apiData?.data?.result?.data,
-        dropDownData: tempData,
-      };
-      dispatch(branchesData(apiData));
+      dispatch(branchesData({ branches: apiResponse.data.result.data, dropDownData: tempData }));
       setBranchData(tempData);
     }
   };
@@ -606,7 +591,7 @@ const Branches = ({ navigation, route }) => {
                       bgColor={Config.Colors.inputField}
                       countryCodeStatus={true}
                       onChangeText={text => handleOnChange('location', text)}
-                      value={formInputs?.location?.locationName}
+                      value={formInputs?.location && typeof formInputs.location === 'object' ? (formInputs.location.locationName ?? '') : ''}
                       editable={false}
                       commonWidth={widthToDp(90)}
                       commonHeight={widthToDp(15)}

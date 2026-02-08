@@ -87,6 +87,7 @@ type CustomInputBoxProps = {
   onFocusFunction?: () => void;
   editable?: boolean;
   multiline?: boolean;
+  style?: StyleProp<ViewStyle | TextStyle>;
 };
  
 export const CustomInputBox: React.FC<CustomInputBoxProps> = ({
@@ -266,13 +267,12 @@ export const CustomDropDownComponent: React.FC<CustomDropDownProps> = ({
           {
             width: commonWidth,
             height: commonHeight,
-            borderColor: borderColor ? borderColor : null,
-            fontFamily: Config.fontFamilys.Poppins_Light,
-            backgroundColor: backgroundColor ? backgroundColor : null,
+            borderColor: borderColor ? borderColor : undefined,
+            backgroundColor: backgroundColor ? backgroundColor : undefined,
             borderWidth: borderColor ? 1 : 0,
             borderRadius: 6,
             paddingHorizontal: 8,
-          },
+          } as ViewStyle,
           isFocus && { borderColor: borderColor },
         ]}
         placeholderStyle={{
@@ -289,10 +289,10 @@ export const CustomDropDownComponent: React.FC<CustomDropDownProps> = ({
           color: defaultColor ? defaultColor : Config.Colors.black,
         }}
         iconStyle={[
-          styles.iconStyle,
+          styles.iconStyle as ImageStyle,
           { tintColor: defaultColor ? defaultColor : Config.Colors.black },
           isFocus && { transform: [{ rotate: '180deg' }] },
-        ]}
+        ] as ImageStyle[]}
         itemTextStyle={{ color: Config.Colors.black }}
         containerStyle={containerStyle}
         data={data}
@@ -302,7 +302,7 @@ export const CustomDropDownComponent: React.FC<CustomDropDownProps> = ({
         valueField="value"
         placeholder={!isFocus ? placeholder : '...'}
         searchPlaceholder="Search..."
-        value={value}
+        value={value as any}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
@@ -334,38 +334,35 @@ export const SelectCountryScreen: React.FC<SelectCountryScreenProps> = ({
   containerStyle,
 }) => {
   const [country, setCountry] = React.useState(defaultCode);
-  return (
-    <Dropdown
-      style={{
+  const dropdownProps = {
+      style: {
         height: commonHeight,
         minWidth: commonWidth,
         backgroundColor: Config.Colors.inputField_1,
         borderTopLeftRadius: widthToDp(1),
         borderBottomLeftRadius: widthToDp(1),
         paddingHorizontal: 8,
-        fontFamily: Config.fontFamilys.Poppins_Medium,
-      }}
-      selectedTextStyle={custyles.selectedTextStyle}
-      placeholderStyle={custyles.placeholderStyle}
-      imageStyle={custyles.imageStyle}
-      inputSearchStyle={custyles.inputSearchStyle}
-      iconStyle={custyles.iconStyle}
-      containerStyle={containerStyle}
-      search
-      maxHeight={200}
-      value={country}
-      autoScroll={false}
-      data={country_code as any}
-      valueField="value"
-      labelField="lable"
-      searchPlaceholder="Search..."
-      onChangeText={() => {}}
-      onChange={e => {
+      } as ViewStyle,
+      selectedTextStyle: custyles.selectedTextStyle,
+      placeholderStyle: custyles.placeholderStyle,
+      imageStyle: custyles.imageStyle,
+      inputSearchStyle: custyles.inputSearchStyle,
+      iconStyle: custyles.iconStyle,
+      containerStyle: containerStyle,
+      search: true,
+      maxHeight: 200,
+      value: country,
+      autoScroll: false,
+      data: country_code,
+      valueField: 'value',
+      labelField: 'lable',
+      searchPlaceholder: 'Search...',
+      onChange: (e: { value: string; label?: string }) => {
         setCountry(e.value);
         onChangeText(e.value);
-      }}
-    />
-  );
+      },
+    };
+  return <Dropdown {...(dropdownProps as any)} />;
 };
  
 type CustomInputProps = {
@@ -801,8 +798,16 @@ type CustomLabelSelectorProps = {
   onSelect: (value: string | number) => void;
   containerWidth?: number;
   errorMessage?: string;
+  borderColor?: string;
 };
- 
+
+const optionWrapperStyle = (width: number): ViewStyle => ({
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  gap: widthToDp(2),
+  width: width,
+});
+
 export const CustomLabelSelector: React.FC<CustomLabelSelectorProps> = ({
   label,
   options = [],
@@ -815,7 +820,7 @@ export const CustomLabelSelector: React.FC<CustomLabelSelectorProps> = ({
     <View style={{ marginBottom: errorMessage ? heightToDp(2) : heightToDp(1) }}>
       <View style={[styles.container, { width: containerWidth }]}>
         <Text style={styles.selectorLabel}>{label}</Text>
-        <View style={styles.optionWrapper(containerWidth)}>
+        <View style={optionWrapperStyle(containerWidth)}>
           {options.map(option => {
             const isSelected = selectedValue === option.value;
             return (
@@ -926,12 +931,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontFamily: Config.fontFamilys.Poppins_Medium,
   },
-  optionWrapper: (width: number) => ({
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: widthToDp(2),
-    width: width,
-  }),
   optionBox: {
     paddingVertical: heightToDp(1.5),
     paddingHorizontal: widthToDp(4),

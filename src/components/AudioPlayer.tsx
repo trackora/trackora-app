@@ -4,12 +4,13 @@ import Sound from 'react-native-sound';
  
 type AudioPlayerProps = {
   path: string;
+  handleRecoding?: () => void;
 };
  
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ path }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ path, handleRecoding }) => {
   Sound.setCategory('Playback', true);
  
-  const [sound, setSound] = useState<Sound | null>(null);
+  const [sound, setSound] = useState<InstanceType<typeof Sound> | null>(null);
   const [isLoop, setIsLoop] = useState(false);
  
   const handlePlayer = (type: 'play' | 'pause' | 'stop') => {

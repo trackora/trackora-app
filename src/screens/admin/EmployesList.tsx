@@ -26,7 +26,8 @@ import {
   CustomLinearButton,
 } from '../../components/CustomElements';
 import { toLocaleDateString } from '../../helpers/utils';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { attendanceV2List, usersList } from '../../redux/slices/admin.slice';
 import CustomModal from '../../components/CustomModal';
 import Toast from 'react-native-toast-message';
@@ -39,8 +40,8 @@ import { isApiSuccess } from '../../helpers/Validation';
 const EmployesList = ({ navigation, route }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.login);
-  const adminData = useSelector(state => state.admin);
+  const userData = useAppSelector(state => state.login);
+  const adminData = useAppSelector(state => state.admin);
   const [empName, setEmpName] = React.useState('');
   const [loader, setLoader] = React.useState(false);
   const [selectedBranch, setSelectedBranch] = React.useState('');
@@ -219,7 +220,7 @@ const EmployesList = ({ navigation, route }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      getEmployeesList();
+      getEmployeesList(undefined);
     }, []),
   );
   return (
@@ -240,7 +241,7 @@ const EmployesList = ({ navigation, route }) => {
             </View>
             <View>
               <CustomInput
-                commonWidth={'100%'}
+                commonWidth={widthToDp(100)}
                 onChangeText={onChange}
                 value={empName}
                 placeholder={t(Config.adminHomeScreenText.search_emp)}
@@ -253,7 +254,7 @@ const EmployesList = ({ navigation, route }) => {
                 countryCodeStatus={true}
                 commonHeight={widthToDp(12)}
                 textAlignVertical="center"
-                onSubmitEditing={text => onSubmitEditing(text)}
+                onSubmitEditing={() => getEmployeesList(empName)}
                 borderColor={Config.Colors.searchBriderInput}
               />
             </View>

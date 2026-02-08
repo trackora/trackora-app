@@ -12,7 +12,8 @@ import * as Icons from '../../helpers/Icons';
 import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { clearAll } from '../../helpers/localStorage';
 import { apiPostService } from '../../helpers/services';
 import { login } from '../../redux/slices/login.slice';
@@ -27,7 +28,7 @@ import { isApiSuccess } from '../../helpers/Validation';
 
 const Settings = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const selectedLanguage = useSelector(
+  const selectedLanguage = useAppSelector(
     state => state?.user?.currentAppLanguage,
   );
   const [notificationCount, setNotificationCount] = useState(null);
@@ -60,8 +61,8 @@ const Settings = ({ navigation, route }) => {
         break;
     }
   };
-  const handleChangeLanguage = item => {
-    setOpenModal(changeLanguage(item));
+  const handleChangeLanguage = (item: { code?: string }) => {
+    changeLanguage(item).then(() => setOpenModal(false));
   };
   const renderLanguage = ({ item }) => {
     return (

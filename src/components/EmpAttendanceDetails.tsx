@@ -204,7 +204,7 @@ const EmpAttendanceDetails: React.FC<Props> = ({
 
   return (
     <>
-      <FlatList
+      <FlatList<SummaryItem>
         data={attendanceData?.details ?? []}
         renderItem={renderSummaryItem}
         horizontal
@@ -214,7 +214,7 @@ const EmpAttendanceDetails: React.FC<Props> = ({
 
       {attendanceData?.data?.length ? (
         <>
-          <FlatList
+          <FlatList<AttendanceItem>
             data={attendanceData.data}
             renderItem={viewAttRenderItem}
             keyExtractor={keyExtractor}

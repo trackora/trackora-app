@@ -25,7 +25,7 @@ const SalaryDetails = ({ navigation, route }) => {
     const { t } = useTranslation();
     const [mapModal, setMapModal] = useState(false);
     const [pageLoader, setPageLoader] = useState(false);
-    const [userData, setUserData] = useState([]);
+    const [userData, setUserData] = useState<any>([]);
     const [userSalaryData, setUserSalaryData] = useState([]);
     const [userDetails, setUserDetails] = useState("salary");
     const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -34,7 +34,7 @@ const SalaryDetails = ({ navigation, route }) => {
     const [liveLocation, setLiveLocation] = useState(null);
     const flatListRef = useRef(null);
     const [showMonth, setShowmonth] = useState(false);
-    const [attendanceData, setAttendanceData] = useState([]);
+    const [attendanceData, setAttendanceData] = useState<any>([]);
     const [fullImage, setFullImage] = useState(false);
     const [imagePath, setImagePath] = useState("");
     const [attendMonth, setAttendMonth] = useState(new Date());
@@ -111,7 +111,7 @@ const SalaryDetails = ({ navigation, route }) => {
                 detail: tempData,
             };
             console.log("attendanceData==>", apiData);
-            setAttendanceData(apiData);
+            setAttendanceData(apiData as any);
         }
     }, []);
 
@@ -120,7 +120,7 @@ const SalaryDetails = ({ navigation, route }) => {
     useFocusEffect(useCallback(() => {
         let updateDate = toLocaleDateString(attendMonth).customMonth;
         handleAttendanceList({ month: updateDate });
-        handleUserData();
+        handleUserData(undefined);
     }, []));
 
 
@@ -205,7 +205,7 @@ const SalaryDetails = ({ navigation, route }) => {
                                 >
                                     <ActivityIndicator
                                         size={35}
-                                        color={Config.Colors.textColor}
+                                        color={Config.Colors.textColor.textColor_1}
                                     />
                                 </View>
                             ) : null}
@@ -288,14 +288,14 @@ const SalaryDetails = ({ navigation, route }) => {
             </>
         ) : userDetails === "attendance" ? (
             <>
-                <EmpAttendanceDetails attendanceData={attendanceData} userData={userSalaryData} handleUserLocation={handleUserLocation} selectedMonth={attendMonth}/>
+                <EmpAttendanceDetails attendanceData={attendanceData} userData={{ id: route?.params?.id ?? '' }} handleUserLocation={handleUserLocation} selectedMonth={attendMonth}/>
             </>
         ) : userDetails === "notes" ? (
             <View style={{ height: heightToDp(80) }}>
                 {userData?.notesData?.length ? (
                     <FlatList
                         refreshing={pageLoader}
-                        onRefresh={() => handleUserData()}
+                        onRefresh={() => handleUserData(undefined)}
                         ref={(it) => (flatListRef.current = it)}
                         data={userData?.notesData}
                         onContentSizeChange={() =>
@@ -323,7 +323,7 @@ const SalaryDetails = ({ navigation, route }) => {
                             height: "100%",
                         }}
                     >
-                        <ActivityIndicator size={35} color={Config.Colors.textColor} />
+                        <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
                     </View>
                 ) : (
                     <View
@@ -406,7 +406,7 @@ const SalaryDetails = ({ navigation, route }) => {
                 ) : null}
                 {fullImage ? (
                     <CustomModal modalVisible={fullImage} onRequestClose={() => setFullImage(!fullImage)} backgroundColor="#000" transparent={false} showHeader={true} headerText="">
-                        <CustomImageVIew imageLoader={imageLoader} handleFullImage={() => setFullImage(!fullImage)} imagePath={imagePath} handleSubmit={() => handleSubmitImage(base64)} />
+                        <CustomImageVIew imageLoader={imageLoader} handleFullImage={() => setFullImage(!fullImage)} imagePath={imagePath} handleSubmit={() => { /* TODO: implement handleSubmitImage */ }} />
                     </CustomModal>
                 ) : null}
             </View>

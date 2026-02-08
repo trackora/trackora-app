@@ -147,7 +147,7 @@ const Documents: React.FC<DocumentsProps> = ({ navigation }) => {
 
   const uploadDoc = async (type: string, imageSide: string) => {
     setUploadLoader(true);
-    const mediaData: any = await handleCamera("photo", type);
+    const mediaData: any = await handleCamera("photo", type as "openPicker" | "openCamera");
     const imageBodyData = {
       base64: `data:image/jpeg;base64,${mediaData?.data ?? ""}`,
     };

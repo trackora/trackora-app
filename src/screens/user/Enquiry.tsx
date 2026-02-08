@@ -239,9 +239,8 @@ const styles = StyleSheet.create({
     fontSize: widthToDp(3.5),
     fontWeight: Config.WEIGHTS.light,
     fontFamily: Config.fontFamilys.Poppins_Medium,
-    color: Config.Colors.primary,
-    marginBottom: -10,
     color: Config.Colors.black,
+    marginBottom: -10,
   },
   messageBoxContainer: {
     alignSelf: 'flex-start',

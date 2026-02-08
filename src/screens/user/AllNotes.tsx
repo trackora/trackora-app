@@ -36,6 +36,7 @@ const AllNotes = () => {
       />
       <CustomModal
         modalVisible={selectedImage !== null}
+        onRequestClose={() => setSelectedImage(null)}
         transparent={true}
         animationType="fade"
         style={{}}
