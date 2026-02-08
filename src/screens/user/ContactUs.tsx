@@ -26,12 +26,12 @@ import { apiPostService } from '../../helpers/services';
 import { login } from '../../redux/slices/login.slice';
 import { isApiSuccess } from '../../helpers/Validation';
 
-const ContactUs = ({ navigation }) => {
+const ContactUs = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const mapRef = useRef(null);
 
-  const { data: tokenData } = useSelector(state => state.login);
+  const { data: tokenData } = useSelector(state => state?.login);
 
   const [mapType, setMapType] = useState('standard');
   const [mapLocation, setMapLocation] = useState({
@@ -200,7 +200,7 @@ const ContactUs = ({ navigation }) => {
 /**
  * Reusable component: Single contact row
  */
-const ContactRow = ({ icon, label, value, multiline }) => (
+const ContactRow = ({ icon, label, value, multiline }: any) => (
   <View style={styles.row}>
     <Image source={icon} style={styles.rowIcon} resizeMode="contain" />
     <View>
@@ -215,7 +215,7 @@ const ContactRow = ({ icon, label, value, multiline }) => (
 /**
  * Reusable component: Social links row
  */
-const SocialRow = ({ facebook, instagram, website }) => (
+const SocialRow = ({ facebook, instagram, website }: any) => (
   <View
     style={[
       styles.row,
@@ -228,7 +228,7 @@ const SocialRow = ({ facebook, instagram, website }) => (
   </View>
 );
 
-const SocialIcon = ({ icon, url }) => (
+const SocialIcon = ({ icon, url }: any) => (
   <TouchableOpacity
     style={styles.socialButton}
     onPress={() => Linking.openURL(url || '#')}
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: widthToDp(3),
-    color: Config.Colors.error || 'red',
+    color: 'red',
     marginTop: 10,
   },
 });

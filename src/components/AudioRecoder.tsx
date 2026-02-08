@@ -21,7 +21,7 @@ import {
 } from 'react-native';
 import Button from '../components/Button';
 import RNFS from 'react-native-fs';
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -99,46 +99,45 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
   },
 });
- 
+
 const audioRecorderPlayer = new AudioRecorderPlayer();
 audioRecorderPlayer.setSubscriptionDuration(0.1);
- 
+
 const AudioRecoder: React.FC = () => {
   const path = Platform.select({
     ios: undefined,
     android: `${RNFS.DocumentDirectoryPath}/hello.mp3`.replace(/:/g, '-'),
   });
+
   const screenWidth = Dimensions.get('screen').width;
+
   const [recordSecs, setRecordSecs] = React.useState(0);
   const [recordTime, setRecordTime] = React.useState('00:00:00');
   const [currentPositionSec, setCurrentPositionSec] = React.useState(0);
-  const [currentDurationSec, setCurrentDurationSec] = React.useState(0);
+  const [currentDurationSec, setCurrentDurationSec] = React.useState(1);
   const [playTime, setPlayTime] = React.useState('00:00:00');
   const [duration, setDuration] = React.useState('00:00:00');
- 
-  let playWidth =
-    (currentPositionSec / currentDurationSec) * (screenWidth - 56);
-  if (!playWidth) {
-    playWidth = 0;
-  }
- 
+
+  const playWidth =
+    currentDurationSec > 0
+      ? (currentPositionSec / currentDurationSec) * (screenWidth - 56)
+      : 0;
+
   const onStatusPress = (e: GestureResponderEvent) => {
     const touchX = e.nativeEvent.locationX;
- 
     const currentPlayWidth =
       (currentPositionSec / currentDurationSec) * (screenWidth - 56);
- 
     const currentPosition = Math.round(currentPositionSec);
- 
-    if (currentPlayWidth && currentPlayWidth < touchX) {
-      const addSecs = Math.round(currentPosition + 1000);
-      audioRecorderPlayer.seekToPlayer(addSecs);
+
+    if (currentPlayWidth < touchX) {
+      audioRecorderPlayer.seekToPlayer(currentPosition + 1000);
     } else {
-      const subSecs = Math.round(currentPosition - 1000);
-      audioRecorderPlayer.seekToPlayer(subSecs);
+      audioRecorderPlayer.seekToPlayer(
+        Math.max(currentPosition - 1000, 0),
+      );
     }
   };
- 
+
   const onStartRecord = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -147,25 +146,17 @@ const AudioRecoder: React.FC = () => {
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
         ]);
- 
-        if (
-          grants['android.permission.WRITE_EXTERNAL_STORAGE'] ===
-            PermissionsAndroid.RESULTS.GRANTED &&
-          grants['android.permission.READ_EXTERNAL_STORAGE'] ===
-            PermissionsAndroid.RESULTS.GRANTED &&
-          grants['android.permission.RECORD_AUDIO'] ===
-            PermissionsAndroid.RESULTS.GRANTED
-        ) {
-          // permissions granted
-        } else {
-          return;
-        }
-      } catch (err) {
-        console.warn(err);
+
+        const granted = Object.values(grants).every(
+          g => g === PermissionsAndroid.RESULTS.GRANTED,
+        );
+
+        if (!granted) return;
+      } catch {
         return;
       }
     }
- 
+
     const audioSet = {
       AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
       AudioSourceAndroid: AudioSourceAndroidType.MIC,
@@ -174,132 +165,72 @@ const AudioRecoder: React.FC = () => {
       AVFormatIDKeyIOS: AVEncodingOption.aac,
       OutputFormatAndroid: OutputFormatAndroidType.AAC_ADTS,
     };
- 
-    const uri = await audioRecorderPlayer.startRecorder(path, audioSet);
- 
+
+    await audioRecorderPlayer.startRecorder(path, audioSet);
+
     audioRecorderPlayer.addRecordBackListener((e: RecordBackType) => {
       setRecordSecs(e.currentPosition);
       setRecordTime(
         audioRecorderPlayer.mmssss(Math.floor(e.currentPosition)),
       );
     });
-    console.log(`uri: ${uri}`);
   };
- 
-  const onPauseRecord = async () => {
-    try {
-      const r = await audioRecorderPlayer.pauseRecorder();
-      console.log(r);
-    } catch (err) {
-      console.log('pauseRecord', err);
-    }
-  };
- 
-  const onResumeRecord = async () => {
-    await audioRecorderPlayer.resumeRecorder();
-  };
- 
+
   const onStopRecord = async () => {
-    const result = await audioRecorderPlayer.stopRecorder();
+    await audioRecorderPlayer.stopRecorder();
     audioRecorderPlayer.removeRecordBackListener();
     setRecordSecs(0);
-    console.log(result);
   };
- 
+
   const onStartPlay = async () => {
-    try {
-      const msg = await audioRecorderPlayer.startPlayer(path);
-      const volume = await audioRecorderPlayer.setVolume(1.0);
-      console.log(`path: ${msg}`, `volume: ${volume}`);
- 
-      audioRecorderPlayer.addPlayBackListener((e: PlayBackType) => {
-        setCurrentPositionSec(e.currentPosition);
-        setCurrentDurationSec(e.duration);
-        setPlayTime(audioRecorderPlayer.mmssss(Math.floor(e.currentPosition)));
-        setDuration(audioRecorderPlayer.mmssss(Math.floor(e.duration)));
-      });
-    } catch (err) {
-      console.log('startPlayer error', err);
-    }
+    await audioRecorderPlayer.startPlayer(path);
+    audioRecorderPlayer.setVolume(1.0);
+
+    audioRecorderPlayer.addPlayBackListener((e: PlayBackType) => {
+      setCurrentPositionSec(e.currentPosition);
+      setCurrentDurationSec(e.duration || 1);
+      setPlayTime(audioRecorderPlayer.mmssss(e.currentPosition));
+      setDuration(audioRecorderPlayer.mmssss(e.duration));
+    });
   };
- 
-  const onPausePlay = async () => {
-    await audioRecorderPlayer.pausePlayer();
-  };
- 
-  const onResumePlay = async () => {
-    await audioRecorderPlayer.resumePlayer();
-  };
- 
+
   const onStopPlay = async () => {
     audioRecorderPlayer.stopPlayer();
     audioRecorderPlayer.removePlayBackListener();
   };
- 
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titleTxt}>Audio Recorder Player</Text>
       <Text style={styles.txtRecordCounter}>{recordTime}</Text>
+
       <View style={styles.viewRecorder}>
         <View style={styles.recordBtnWrapper}>
-          <Button style={styles.btn} onPress={onStartRecord} textStyle={styles.txt}>
+          <Button style={styles.btn as any} onPress={onStartRecord} textStyle={styles.txt as any}>
             Record
           </Button>
-          <Button
-            style={[styles.btn, { marginLeft: 12 }]}
-            onPress={onPauseRecord}
-            textStyle={styles.txt}
-          >
-            Pause
-          </Button>
-          <Button
-            style={[styles.btn, { marginLeft: 12 }]}
-            onPress={onResumeRecord}
-            textStyle={styles.txt}
-          >
-            Resume
-          </Button>
-          <Button
-            style={[styles.btn, { marginLeft: 12 }]}
-            onPress={onStopRecord}
-            textStyle={styles.txt}
-          >
+          <Button style={styles.btn as any} onPress={onStopRecord} textStyle={styles.txt as any}>
             Stop
           </Button>
         </View>
       </View>
+
       <View style={styles.viewPlayer}>
         <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>
           <View style={styles.viewBar}>
             <View style={[styles.viewBarPlay, { width: playWidth }]} />
           </View>
         </TouchableOpacity>
+
         <Text style={styles.txtCounter}>
           {playTime} / {duration}
         </Text>
+
         <View style={styles.playBtnWrapper}>
-          <Button style={styles.btn} onPress={onStartPlay} textStyle={styles.txt}>
+          <Button style={styles.btn as any} onPress={onStartPlay} textStyle={styles.txt as any}>
             Play
           </Button>
-          <Button
-            style={[styles.btn, { marginLeft: 12 }]}
-            onPress={onPausePlay}
-            textStyle={styles.txt}
-          >
-            Pause
-          </Button>
-          <Button
-            style={[styles.btn, { marginLeft: 12 }]}
-            onPress={onResumePlay}
-            textStyle={styles.txt}
-          >
-            Resume
-          </Button>
-          <Button
-            style={[styles.btn, { marginLeft: 12 }]}
-            onPress={onStopPlay}
-            textStyle={styles.txt}
-          >
+          <Button style={styles.btn as any} onPress={onStopPlay} textStyle={styles.txt as any}>
             Stop
           </Button>
         </View>
@@ -307,5 +238,5 @@ const AudioRecoder: React.FC = () => {
     </SafeAreaView>
   );
 };
- 
+
 export default AudioRecoder;

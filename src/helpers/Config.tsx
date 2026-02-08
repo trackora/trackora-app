@@ -80,6 +80,7 @@ export const Colors = {
   yellow: '#f5b400',
   green: '#6fb423',
   cyan_blue: '#f6fbff',
+  grey:"gray",
   RGBAColors: {
     primary: 'rgba(32, 78, 113, 1.0)',
     secondary: 'rgba(173, 59, 68, 1.0)',

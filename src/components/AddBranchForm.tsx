@@ -12,14 +12,17 @@ import * as Config from "../helpers/Config";
 import * as Icons from "../helpers/Icons";
 import { Header_2 } from "../components/Header";
 import { useTranslation } from "react-i18next";
-import { CustomInput, CustomLinearButton } from "../components/CustomElements";
+import {
+  CustomInputBox,
+  CustomLinearButton,
+} from "../components/CustomElements";
 import Geolocation from "react-native-geolocation-service";
 import MiniMap from "./MiniMap";
 import CustomModal from "./CustomModal";
 import { apiPostService } from "../helpers/services";
 import * as Constants from "../helpers/Constants";
 
-const CustomInputAny = CustomInput as React.ComponentType<any>;
+const CustomInputAny = CustomInputBox as React.ComponentType<any>;
 const CustomLinearButtonAny = CustomLinearButton as React.ComponentType<any>;
 
 type BranchLocation = {

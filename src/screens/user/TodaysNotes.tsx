@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -8,52 +8,52 @@ import {
   FlatList,
   ActivityIndicator,
   ListRenderItemInfo,
-} from 'react-native';
-import * as Icons from '../../helpers/Icons';
-import * as Config from '../../helpers/Config';
-import * as Constants from '../../helpers/Constants';
-import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useSelector } from 'react-redux';
-import { handleCamera, toLocaleDateString } from '../../helpers/utils';
-import { apiPostService } from '../../helpers/services';
-import { useFocusEffect } from '@react-navigation/native';
-import { CustomInputBox } from '../../components/CustomElements';
-import CustomModal from '../../components/CustomModal';
-import CustomImageVIew from './CustomImageVIew';
-import { useTranslation } from 'react-i18next';
- 
+} from "react-native";
+import * as Icons from "../../helpers/Icons";
+import * as Config from "../../helpers/Config";
+import * as Constants from "../../helpers/Constants";
+import { heightToDp, widthToDp } from "../../helpers/Responsive";
+import { useSelector } from "react-redux";
+import { handleCamera, toLocaleDateString } from "../../helpers/utils";
+import { apiPostService } from "../../helpers/services";
+import { useFocusEffect } from "@react-navigation/native";
+import { CustomInputBox } from "../../components/CustomElements";
+import CustomModal from "../../components/CustomModal";
+import CustomImageVIew from "./CustomImageVIew";
+import { useTranslation } from "react-i18next";
+
 type RootState = {
   login?: any;
 };
- 
+
 type ChatMessage = {
   id?: number | string;
   text?: string;
   filename?: string;
   created_on?: string | number | Date;
 };
- 
+
 type TodayNotesProps = {
   navigation: any;
   route: any;
 };
- 
+
 const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
   const [chatMessage, setChatMessage] = React.useState<ChatMessage[]>([]);
-  const [message, setMessage] = React.useState('');
+  const [message, setMessage] = React.useState("");
   const [openModal, setOpenModal] = React.useState(false);
   const getTokenData = useSelector((state: RootState) => state.login);
   const [fullImage, setFullImage] = React.useState(false);
-  const [imagePath, setImagePath] = React.useState('');
+  const [imagePath, setImagePath] = React.useState("");
   const [pageLoader, setPageLoader] = React.useState(false);
   const { t } = useTranslation();
   const flatListRef = useRef<FlatList<ChatMessage> | null>(null);
- 
+
   const handelFullImage = (img: string) => {
     setFullImage(true);
     setImagePath(img);
   };
- 
+
   const getMessage = async () => {
     setPageLoader(true);
     const bodyData = {
@@ -69,29 +69,29 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
     }
     setPageLoader(false);
   };
- 
+
   const sendMessage = async () => {
     const chatBodyData = {
       user_id: getTokenData?.data?.loginData?.id,
       username: getTokenData?.data?.loginData?.name,
       text: message,
-      filename: '',
+      filename: "",
     };
     const chatApiRes = await apiPostService(
       Constants?.add_notes_api,
       chatBodyData,
     );
-    if (chatApiRes?.data?.status === 'success') {
+    if (chatApiRes?.data?.status === "success") {
       await getMessage();
-      setMessage('');
+      setMessage("");
     }
   };
- 
-  const uploadDoc = async (type?: string) => {
-    const mediaData = await handleCamera('photo', type);
+
+  const uploadDoc = async (type?: "openPicker" | "openCamera") => {
+    const mediaData = await handleCamera("photo", type);
     const bodyData = {
-      appType: 'sfa',
-      base64: `data:image/jpeg;base64,${mediaData?.data ?? ''}`,
+      appType: "sfa",
+      base64: `data:image/jpeg;base64,${mediaData?.data ?? ""}`,
     };
     setOpenModal(false);
     if (bodyData) {
@@ -99,46 +99,44 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
         Constants?.base64_to_file_api,
         bodyData,
       );
-      if (apiData?.data?.status === 'success') {
+      if (apiData?.data?.status === "success") {
         const chatBodyData = {
           user_id: getTokenData?.data?.loginData?.id,
           username: getTokenData?.data?.loginData?.name,
           text: message,
-          filename: 'uploads/2023-07/1789438732834.jpeg',
+          filename: "uploads/2023-07/1789438732834.jpeg",
         };
         const chatApiRes = await apiPostService(
           Constants?.add_notes_api,
           chatBodyData,
         );
-        if (chatApiRes?.data?.status === 'success') {
+        if (chatApiRes?.data?.status === "success") {
           getMessage();
-          setMessage('');
+          setMessage("");
         }
       }
     }
   };
- 
+
   useFocusEffect(
     React.useCallback(() => {
       getMessage();
     }, []),
   );
- 
+
   const keyExtractor = React.useCallback(
     (item: ChatMessage, index: number) => String(item?.id ?? index),
     [],
   );
- 
-  const renderItemMessage = ({
-    item,
-  }: ListRenderItemInfo<ChatMessage>) => {
+
+  const renderItemMessage = ({ item }: ListRenderItemInfo<ChatMessage>) => {
     const formattedDate = toLocaleDateString(
       item?.created_on ?? new Date(),
     ) as { customDateTime?: string };
- 
+
     return (
-      <View style={{ width: '100%' }}>
-        <View style={{ alignItems: 'flex-end', paddingRight: 10, gap: 10 }}>
+      <View style={{ width: "100%" }}>
+        <View style={{ alignItems: "flex-end", paddingRight: 10, gap: 10 }}>
           <View style={{ padding: 10 }}>
             <View
               style={{
@@ -153,7 +151,7 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
               <Text
                 style={{
                   color: Config.Colors.defaultColor,
-                  alignSelf: 'flex-end',
+                  alignSelf: "flex-end",
                 }}
               >
                 {item?.text}
@@ -168,7 +166,7 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
                 borderColor: Config.Colors.black,
                 width: widthToDp(50),
                 height: widthToDp(30),
-                backgroundColor: '#000',
+                backgroundColor: "#000",
               }}
             >
               <Image
@@ -176,7 +174,7 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
                 style={{
                   width: widthToDp(50),
                   height: widthToDp(30),
-                  resizeMode: 'cover',
+                  resizeMode: "cover",
                 }}
               />
             </TouchableOpacity>
@@ -185,11 +183,11 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
       </View>
     );
   };
- 
+
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1, width: '100%', height: '100%', marginTop: 10 }}>
-        <View style={{ height: '90%' }}>
+      <View style={{ flex: 1, width: "100%", height: "100%", marginTop: 10 }}>
+        <View style={{ height: "90%" }}>
           {chatMessage.length ? (
             <FlatList
               refreshing={pageLoader}
@@ -211,9 +209,9 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
           ) : (
             <View
               style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
               }}
             >
               <ActivityIndicator
@@ -226,19 +224,19 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
             </View>
           )}
         </View>
- 
+
         <View
           style={{
             width: widthToDp(100),
-            justifyContent: 'center',
-            alignItems: 'flex-end',
+            justifyContent: "center",
+            alignItems: "flex-end",
             bottom: 0,
-            flexDirection: 'row',
-            alignSelf: 'center',
+            flexDirection: "row",
+            alignSelf: "center",
             gap: 3,
             zIndex: 9999,
             backgroundColor: Config.Colors.bodyBg,
-            height: '9%',
+            height: "9%",
           }}
         >
           <TouchableOpacity
@@ -246,28 +244,28 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
               backgroundColor: Config.Colors.themeColor,
               width: widthToDp(11),
               height: heightToDp(5.5),
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               borderRadius: 100,
             }}
             onPress={() => setOpenModal(true)}
           >
             <Image
               source={Icons.camera_icon}
-              tintColor={'#fff'}
+              tintColor={"#fff"}
               style={{ width: widthToDp(5), height: widthToDp(5) }}
             />
           </TouchableOpacity>
           <CustomInputBox
             commonWidth={widthToDp(75)}
             placeholder={t(Config.todayNotesSreenText?.message)}
-            keyboardType={'default'}
-            autoComplete={'cc-csc'}
+            keyboardType={"default"}
+            autoComplete={"cc-csc"}
             commmonBorderRadius={100}
             borderColor={Config.Colors.themeColor}
             onChangeText={(text: string) => setMessage(text)}
             inputValue={message}
-            errorMessage={''}
+            errorMessage={""}
             numberOfLines={1}
             autoCapitalize="none"
             leftImage={null}
@@ -285,8 +283,8 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
               backgroundColor: Config.Colors.themeColor,
               width: widthToDp(11),
               height: heightToDp(5.5),
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               borderRadius: 100,
             }}
             disabled={!message}
@@ -294,12 +292,12 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
           >
             <Image
               source={Icons.send_icon}
-              tintColor={'#fff'}
+              tintColor={"#fff"}
               style={{ width: widthToDp(5), height: widthToDp(5) }}
             />
           </TouchableOpacity>
         </View>
- 
+
         <View>
           <CustomModal
             modalVisible={openModal}
@@ -312,14 +310,14 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
               style={{
                 width: widthToDp(100),
                 height: heightToDp(15),
-                backgroundColor: '#fff',
+                backgroundColor: "#fff",
                 borderRadius: widthToDp(2),
                 paddingLeft: widthToDp(5),
                 paddingRight: widthToDp(5),
                 paddingBottom: widthToDp(5),
               }}
             >
-              <View style={{ width: '100%' }}>
+              <View style={{ width: "100%" }}>
                 <View>
                   <Text
                     style={{
@@ -332,7 +330,7 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
                 </View>
                 <View style={{ gap: widthToDp(2), marginTop: widthToDp(3) }}>
                   <TouchableOpacity
-                    style={{ flexDirection: 'row', gap: widthToDp(2) }}
+                    style={{ flexDirection: "row", gap: widthToDp(2) }}
                     onPress={() => uploadDoc()}
                   >
                     <Image
@@ -350,8 +348,8 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={{ flexDirection: 'row', gap: widthToDp(2) }}
-                    onPress={() => uploadDoc('openCamera')}
+                    style={{ flexDirection: "row", gap: widthToDp(2) }}
+                    onPress={() => uploadDoc("openCamera")}
                   >
                     <Image
                       source={Icons?.camera_icon}
@@ -389,7 +387,7 @@ const TodayNotes: React.FC<TodayNotesProps> = ({ navigation, route }) => {
     </View>
   );
 };
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -399,33 +397,33 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: Config.fontFamilys.Poppins_Bold,
-    color: '#000',
+    color: "#000",
   },
   box: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 20,
     width: widthToDp(90),
     margin: 10,
     padding: 10,
   },
   boxContainer: {
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   boxContainerIner: {
     marginBottom: widthToDp(16),
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0)",
   },
   bottomImg: {
     backgroundColor: Config.Colors.bodyBg,
     width: widthToDp(10),
     height: heightToDp(5),
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: widthToDp(10),
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: widthToDp(2),
   },
 });
- 
+
 export default React.memo(TodayNotes);

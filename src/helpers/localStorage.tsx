@@ -1,67 +1,76 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const storeData = async (key, data) => {
-  // console.log('validateUserFromServer===>(storeData)=>', key, data);
-  // console.log('Storage data is', key, data);
+/* ===================== STORE ===================== */
+
+const storeData = async (
+  key: string,
+  data: string,
+): Promise<void> => {
   try {
     await AsyncStorage.setItem(key, data);
-  } catch (e) {
-    // console.log(e);
+  } catch {
+    // silent fail (same behavior)
   }
 };
 
-const getData = async key => {
+/* ===================== GET ===================== */
+
+const getData = async (key: string): Promise<string | null> => {
   try {
     const value = await AsyncStorage.getItem(key);
-    if (value !== null) {
-      return value;
-    }
-  } catch (e) {
-    // console.log(e);
+    return value;
+  } catch {
+    return null;
   }
 };
 
-const clearAll = async isFromWeb => {
+/* ===================== CLEAR ===================== */
+
+const clearAll = async (): Promise<void> => {
   try {
     await AsyncStorage.clear();
-  } catch (e) {
-    // console.log(e);
+  } catch {
+    // silent fail
   }
 };
 
-const removeKeyData = async key => {
+/* ===================== REMOVE ONE ===================== */
+
+const removeKeyData = async (key: string): Promise<void> => {
   try {
     await AsyncStorage.removeItem(key);
-  } catch (e) {
-    // console.log(e);
+  } catch {
+    // silent fail
   }
-
-  // console.log(key, 'Removed');
 };
+
+/* ===================== REMOVE MULTIPLE ===================== */
 
 const removeMultipleKeysDataFromLocalStorage = async (
-  ...removeAllKeyDataExceptThisKeys
-) => {
-  let keys = [];
+  ...removeAllKeyDataExceptThisKeys: string[]
+): Promise<void> => {
   try {
-    keys = await AsyncStorage.getAllKeys();
-    keys = keys.filter(e => !removeAllKeyDataExceptThisKeys.includes(e));
-    await AsyncStorage.multiRemove(keys);
-  } catch (e) {
-    // read key error
-    // console.log('removeMultipleKeysDataFromLocalStorage=>', e);
+    const keys = await AsyncStorage.getAllKeys();
+    const filteredKeys = keys.filter(
+      key => !removeAllKeyDataExceptThisKeys.includes(key),
+    );
+    await AsyncStorage.multiRemove(filteredKeys);
+  } catch {
+    // silent fail
   }
 };
 
-const getAllKeys = async () => {
-  let keys = [];
+/* ===================== GET ALL KEYS ===================== */
+
+const getAllKeys = async (): Promise<readonly string[] | undefined> => {
   try {
-    keys = await AsyncStorage.getAllKeys();
-    return keys;
-  } catch (e) {
-    // read key error
+    return await AsyncStorage.getAllKeys();
+  } catch {
+    return undefined;
   }
 };
+
+/* ===================== EXPORTS ===================== */
 
 export {
   storeData,

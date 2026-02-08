@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   details: {
-    backgroundColor: Config.Colors.grey,
+    backgroundColor: Config.Colors?.grey,
     // width: widthToDp(90),
   },
   details2: {
