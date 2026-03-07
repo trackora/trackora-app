@@ -1,6 +1,6 @@
 import * as BottomNavigation from './BottomNavigation';
-import * as Icons from '../helpers/Icons.js';
-import * as Config from '../helpers/Config.js';
+import * as Icons from '../helpers/Icons';
+import * as Config from '../helpers/Config';
 import AboutUs from '../screens/user/AboutUs';
 import Alarm from '../screens/user/Alarm';
 import Attendance from '../screens/user/Attendance';
@@ -23,13 +23,13 @@ import LeaveRequests from '../screens/admin/LeaveRequests';
 import Reports from '../screens/admin/Reports';
 import Biometric from '../screens/admin/Biometric';
 import SalaryDetails from '../screens/admin/SalaryDetails';
-import Home from '../screens/admin/Home.js';
-import Settings from '../screens/admin/Settings.js';
-import Privacy_Policy from '../screens/user/Privacy_Policy.js';
-import Terms_Conditions from '../screens/user/Terms_Conditions.js';
-import Shift from '../screens/user/Shift.js';
-import Break from '../screens/user/Break.js';
-import DeviceVerification from '../screens/user/(account-settings)/_components/DeviceVerification.jsx';
+import Home from '../screens/admin/Home';
+import Settings from '../screens/admin/Settings';
+import Privacy_Policy from '../screens/user/Privacy_Policy';
+import Terms_Conditions from '../screens/user/Terms_Conditions';
+import Shift from '../screens/user/Shift';
+import Break from '../screens/user/Break';
+import DeviceVerification from '../screens/user/(account-settings)/_components/DeviceVerification';
 
 export const stackNames = [
   {

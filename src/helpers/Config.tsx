@@ -1,6 +1,6 @@
 import * as Icons from './Icons';
 export const GOOGLE_MAP_APIKEY = 'AIzaSyA_2_umC2_jpfUFfRRMjteOOM1l2xEHcwM';
-export const baseUrl = 'https://hrmsapi-dev.web2rise.in';
+export const baseUrl = 'https://karbit-hrms-app-u67tp.ondigitalocean.app';
 export const FCM_SERVER_KEY =
   'c2tLx-aWTMiSlLNYaCMCiq:APA91bGbRKY_QWoD0LXiYZWVZbKOeleizFCAXHVLzKJLKbEsxmQnLCZ2fctr0cis3ePet_wTNOK0mUWbhmt6y50c_-oquFfD94BKeYKg4HlzJ3b04kdpL5gaOZgx-_2z4vNInKl3yrRS';
 export const themeBgColor = '#00579c';

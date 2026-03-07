@@ -1,16 +1,16 @@
-import * as Icons from '../helpers/Icons.js';
-import * as Config from '../helpers/Config.js';
+import * as Icons from '../helpers/Icons';
+import * as Config from '../helpers/Config';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CustomTabBarIcon from '../components/CustomTabBarIcon';
-import Settings from '../screens/admin/Settings.js';
-import Home from '../screens/admin/Home.js';
-import Profile from '../screens/user/Profile.js';
-import Menu from '../screens/user/Menu.js';
-import PunchScreen from '../screens/user/PunchScreen.js';
-import { heightToDp, widthToDp } from '../helpers/Responsive.js';
+import Settings from '../screens/admin/Settings';
+import Home from '../screens/admin/Home';
+import Profile from '../screens/user/Profile';
+import Menu from '../screens/user/Menu';
+import PunchScreen from '../screens/user/PunchScreen';
+import { heightToDp, widthToDp } from '../helpers/Responsive';
 import { useTranslation } from 'react-i18next';
-import HomeScreen from '../screens/user/(home)/HomeScreen.jsx';
+import HomeScreen from '../screens/user/(home)/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 const BottomTabs = () => {
@@ -20,7 +20,7 @@ const BottomTabs = () => {
       // tabBar={props => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        gestureEnabled: true,
+        // gestureEnabled: true,
         tabBarActiveTintColor: Config.Colors.themeColor,
         tabBarInactiveTintColor: Config.Colors.bottomColor,
         tabBarStyle: {
@@ -86,7 +86,7 @@ const AdminBottomTabs = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        gestureEnabled: true,
+        // gestureEnabled: true,
         tabBarActiveTintColor: Config.Colors.themeColor,
         tabBarInactiveTintColor: Config.Colors.themeColor,
         tabBarStyle: {

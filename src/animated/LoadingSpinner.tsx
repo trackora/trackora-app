@@ -1,7 +1,7 @@
 import { View, Image, Animated, Easing, StyleSheet } from 'react-native';
 import React, { useEffect, useRef } from 'react';
-import * as Icons from '../helpers/Icons.js';
-import { widthToDp } from '../helpers/Responsive.js';
+import * as Icons from '../helpers/Icons';
+import { widthToDp } from '../helpers/Responsive';
 
 const LoadingSpinner = ({
   commonWidth = widthToDp(10),

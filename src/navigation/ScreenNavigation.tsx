@@ -1,11 +1,11 @@
 // depandance
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from '../screens/user/Login.js';
-import * as Icons from '../helpers/Icons.js';
-import * as Config from '../helpers/Config.js';
+import Login from '../screens/user/Login';
+import * as Icons from '../helpers/Icons';
+import * as Config from '../helpers/Config';
 import { useTranslation } from 'react-i18next';
-import * as navigationNames from './NavigationNames.js';
+import * as navigationNames from './NavigationNames';
 
 const Stack = createNativeStackNavigator();
 
