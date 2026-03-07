@@ -89,12 +89,15 @@ const RequestLeaveHistory = ({ navigation, route }) => {
     handleLeaveList();
   }, []);
 
-  const keyExtractor = React.useCallback((item, index) => String(index), []);
+  const handleUserModal = (item: unknown) => {
+    // TODO: open user details modal if needed
+  };
+  const keyExtractor = React.useCallback((item: unknown, index: number) => String(index), []);
 
   const ListFooterComponent = () => {
     return loading ? (
       <TouchableOpacity style={{ marginBottom: heightToDp(10), marginTop: 20 }}>
-        <ActivityIndicator size={35} color={Config.Colors.textColor} />
+        <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
       </TouchableOpacity>
     ) : null;
   };
@@ -430,13 +433,13 @@ const RequestLeaveHistory = ({ navigation, route }) => {
             <TouchableOpacity
               style={{ height: '90%', justifyContent: 'center' }}
             >
-              <ActivityIndicator size={35} color={Config.Colors.textColor} />
+              <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
             </TouchableOpacity>
           )}
           {showDeleteAlert ? (
             <AltertBox
               isModalVisible={showDeleteAlert}
-              oonRequestClose={() => setShowDeleteAlert(false)}
+              onRequestClose={() => setShowDeleteAlert(false)}
               confirm={() => {
                 deleteAlertBoxContent?.confirm();
                 setShowDeleteAlert(false); // close after confirm
@@ -622,7 +625,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   details: {
-    backgroundColor: Config.Colors.grey,
+    backgroundColor: Config.Colors?.grey,
     // width: widthToDp(90),
   },
   details2: {

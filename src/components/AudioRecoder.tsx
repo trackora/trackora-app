@@ -1,11 +1,13 @@
+import React from 'react';
 import AudioRecorderPlayer, {
   AVEncoderAudioQualityIOSType,
   AVEncodingOption,
   AudioEncoderAndroidType,
   AudioSourceAndroidType,
   OutputFormatAndroidType,
+  PlayBackType,
+  RecordBackType,
 } from 'react-native-audio-recorder-player';
-
 import {
   Dimensions,
   PermissionsAndroid,
@@ -15,13 +17,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  GestureResponderEvent,
 } from 'react-native';
-import React, {Component} from 'react';
-
 import Button from '../components/Button';
+import RNFS from 'react-native-fs';
 
-import RNFS from 'react-native-fs'
-const styles= StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#455A64',
@@ -100,47 +101,40 @@ const styles= StyleSheet.create({
 });
 
 const audioRecorderPlayer = new AudioRecorderPlayer();
-audioRecorderPlayer.setSubscriptionDuration(0.1); // optional. Default is 0.5
-const AudioRecoder = ()=>{
+audioRecorderPlayer.setSubscriptionDuration(0.1);
+
+const AudioRecoder: React.FC = () => {
   const path = Platform.select({
     ios: undefined,
-    android: `${RNFS.DocumentDirectoryPath}/hello.mp3`.replace(/:/g, '-')
+    android: `${RNFS.DocumentDirectoryPath}/hello.mp3`.replace(/:/g, '-'),
   });
+
   const screenWidth = Dimensions.get('screen').width;
-  const [isLoggingIn, setIsLoggingIn] = React.useState(false)
-  const [recordSecs, setRecordSecs] = React.useState(0)
-  const [recordTime, setRecordTime] = React.useState('00:00:00')
-  const [currentPositionSec, setCurrentPositionSec] = React.useState(0)
-  const [currentDurationSec, setCurrentDurationSec] = React.useState(0)
-  const [playTime, setPlayTime] = React.useState('00:00:00')
-  const [duration, setDuration] = React.useState('00:00:00')
 
-  let playWidth =
-  (currentPositionSec / currentDurationSec) *
-  (screenWidth - 56);
-  if (!playWidth) {
-    playWidth = 0;
-  }
+  const [recordSecs, setRecordSecs] = React.useState(0);
+  const [recordTime, setRecordTime] = React.useState('00:00:00');
+  const [currentPositionSec, setCurrentPositionSec] = React.useState(0);
+  const [currentDurationSec, setCurrentDurationSec] = React.useState(1);
+  const [playTime, setPlayTime] = React.useState('00:00:00');
+  const [duration, setDuration] = React.useState('00:00:00');
 
-  const onStatusPress = (e) => {
+  const playWidth =
+    currentDurationSec > 0
+      ? (currentPositionSec / currentDurationSec) * (screenWidth - 56)
+      : 0;
+
+  const onStatusPress = (e: GestureResponderEvent) => {
     const touchX = e.nativeEvent.locationX;
-    console.log(`touchX: ${touchX}`);
+    const currentPlayWidth =
+      (currentPositionSec / currentDurationSec) * (screenWidth - 56);
+    const currentPosition = Math.round(currentPositionSec);
 
-    const playWidth =
-      (state.currentPositionSec / state.currentDurationSec) *
-      (screenWidth - 56);
-    console.log(`currentPlayWidth: ${playWidth}`);
-
-    const currentPosition = Math.round(state.currentPositionSec);
-
-    if (playWidth && playWidth < touchX) {
-      const addSecs = Math.round(currentPosition + 1000);
-      audioRecorderPlayer.seekToPlayer(addSecs);
-      console.log(`addSecs: ${addSecs}`);
+    if (currentPlayWidth < touchX) {
+      audioRecorderPlayer.seekToPlayer(currentPosition + 1000);
     } else {
-      const subSecs = Math.round(currentPosition - 1000);
-      audioRecorderPlayer.seekToPlayer(subSecs);
-      console.log(`subSecs: ${subSecs}`);
+      audioRecorderPlayer.seekToPlayer(
+        Math.max(currentPosition - 1000, 0),
+      );
     }
   };
 
@@ -153,25 +147,12 @@ const AudioRecoder = ()=>{
           PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
         ]);
 
-        console.log('write external stroage', grants);
+        const granted = Object.values(grants).every(
+          g => g === PermissionsAndroid.RESULTS.GRANTED,
+        );
 
-        if (
-          grants['android.permission.WRITE_EXTERNAL_STORAGE'] ===
-            PermissionsAndroid.RESULTS.GRANTED &&
-          grants['android.permission.READ_EXTERNAL_STORAGE'] ===
-            PermissionsAndroid.RESULTS.GRANTED &&
-          grants['android.permission.RECORD_AUDIO'] ===
-            PermissionsAndroid.RESULTS.GRANTED
-        ) {
-          console.log('permissions granted');
-        } else {
-          console.log('All required permissions not granted');
-
-          return;
-        }
-      } catch (err) {
-        console.warn(err);
-
+        if (!granted) return;
+      } catch {
         return;
       }
     }
@@ -185,181 +166,77 @@ const AudioRecoder = ()=>{
       OutputFormatAndroid: OutputFormatAndroidType.AAC_ADTS,
     };
 
-    console.log('audioSet', audioSet);
+    await audioRecorderPlayer.startRecorder(path, audioSet);
 
-    const uri = await audioRecorderPlayer.startRecorder(
-      path,
-      audioSet,
-    );
-
-    audioRecorderPlayer.addRecordBackListener((e) => {
-      // console.log('record-back', e);
+    audioRecorderPlayer.addRecordBackListener((e: RecordBackType) => {
       setRecordSecs(e.currentPosition);
-      setRecordTime(audioRecorderPlayer.mmssss(
-        Math.floor(e.currentPosition),
-      ))
+      setRecordTime(
+        audioRecorderPlayer.mmssss(Math.floor(e.currentPosition)),
+      );
     });
-    console.log(`uri: ${uri}`);
-  };
-
-  const onPauseRecord = async () => {
-    try {
-      const r = await audioRecorderPlayer.pauseRecorder();
-      console.log(r);
-    } catch (err) {
-      console.log('pauseRecord', err);
-    }
-  };
-
-  const onResumeRecord = async () => {
-    await audioRecorderPlayer.resumeRecorder();
   };
 
   const onStopRecord = async () => {
-    console.log("test")
-    const result = await audioRecorderPlayer.stopRecorder();
+    await audioRecorderPlayer.stopRecorder();
     audioRecorderPlayer.removeRecordBackListener();
-    setRecordSecs(0)
-    console.log(result);
+    setRecordSecs(0);
   };
 
   const onStartPlay = async () => {
-    console.log('onStartPlay', path);
+    await audioRecorderPlayer.startPlayer(path);
+    audioRecorderPlayer.setVolume(1.0);
 
-    try {
-      const msg = await audioRecorderPlayer.startPlayer(path);
-
-      //? Default path
-      // const msg = await audioRecorderPlayer.startPlayer();
-      const volume = await audioRecorderPlayer.setVolume(1.0);
-      console.log(`path: ${msg}`, `volume: ${volume}`);
-
-      audioRecorderPlayer.addPlayBackListener((e) => {
-        console.log('playBackListener', e);
-        setCurrentPositionSec( e.currentPosition)
-        setCurrentDurationSec(e.duration)
-        setPlayTime(audioRecorderPlayer.mmssss(
-          Math.floor(e.currentPosition),
-        ))
-        setDuration(audioRecorderPlayer.mmssss(Math.floor(e.duration)))
-      });
-    } catch (err) {
-      console.log('startPlayer error', err);
-    }
-  };
-
-  const onPausePlay = async () => {
-    await audioRecorderPlayer.pausePlayer();
-  };
-
-  const onResumePlay = async () => {
-    await audioRecorderPlayer.resumePlayer();
+    audioRecorderPlayer.addPlayBackListener((e: PlayBackType) => {
+      setCurrentPositionSec(e.currentPosition);
+      setCurrentDurationSec(e.duration || 1);
+      setPlayTime(audioRecorderPlayer.mmssss(e.currentPosition));
+      setDuration(audioRecorderPlayer.mmssss(e.duration));
+    });
   };
 
   const onStopPlay = async () => {
-    console.log('onStopPlay');
     audioRecorderPlayer.stopPlayer();
     audioRecorderPlayer.removePlayBackListener();
   };
 
-
-  return(
+  return (
     <SafeAreaView style={styles.container}>
-    <Text style={styles.titleTxt}>Audio Recorder Player</Text>
-    <Text style={styles.txtRecordCounter}>{recordTime}</Text>
-    <View style={styles.viewRecorder}>
-      <View style={styles.recordBtnWrapper}>
-        <Button
-          style={styles.btn}
-          onPress={onStartRecord}
-          textStyle={styles.txt}>
-          Record
-        </Button>
-        <Button
-          style={[
-            styles.btn,
-            {
-              marginLeft: 12,
-            },
-          ]}
-          onPress={onPauseRecord}
-          textStyle={styles.txt}>
-          Pause
-        </Button>
-        <Button
-          style={[
-            styles.btn,
-            {
-              marginLeft: 12,
-            },
-          ]}
-          onPress={onResumeRecord}
-          textStyle={styles.txt}>
-          Resume
-        </Button>
-        <Button
-          style={[styles.btn, {marginLeft: 12}]}
-          onPress={onStopRecord}
-          textStyle={styles.txt}>
-          Stop
-        </Button>
-      </View>
-    </View>
-    <View style={styles.viewPlayer}>
-      <TouchableOpacity
-        style={styles.viewBarWrapper}
-        onPress={onStatusPress}>
-        <View style={styles.viewBar}>
-          <View style={[styles.viewBarPlay, {width: playWidth}]} />
-        </View>
-      </TouchableOpacity>
-      <Text style={styles.txtCounter}>
-        {playTime} / {duration}
-      </Text>
-      <View style={styles.playBtnWrapper}>
-        <Button
-          style={styles.btn}
-          onPress={onStartPlay}
-          textStyle={styles.txt}>
-          Play
-        </Button>
-        <Button
-          style={[
-            styles.btn,
-            {
-              marginLeft: 12,
-            },
-          ]}
-          onPress={onPausePlay}
-          textStyle={styles.txt}>
-          Pause
-        </Button>
-        <Button
-          style={[
-            styles.btn,
-            {
-              marginLeft: 12,
-            },
-          ]}
-          onPress={onResumePlay}
-          textStyle={styles.txt}>
-          Resume
-        </Button>
-        <Button
-          style={[
-            styles.btn,
-            {
-              marginLeft: 12,
-            },
-          ]}
-          onPress={onStopPlay}
-          textStyle={styles.txt}>
-          Stop
-        </Button>
-      </View>
-    </View>
-  </SafeAreaView>
-  )
-}
-export default AudioRecoder;
+      <Text style={styles.titleTxt}>Audio Recorder Player</Text>
+      <Text style={styles.txtRecordCounter}>{recordTime}</Text>
 
+      <View style={styles.viewRecorder}>
+        <View style={styles.recordBtnWrapper}>
+          <Button style={styles.btn as any} onPress={onStartRecord} textStyle={styles.txt as any}>
+            Record
+          </Button>
+          <Button style={styles.btn as any} onPress={onStopRecord} textStyle={styles.txt as any}>
+            Stop
+          </Button>
+        </View>
+      </View>
+
+      <View style={styles.viewPlayer}>
+        <TouchableOpacity style={styles.viewBarWrapper} onPress={onStatusPress}>
+          <View style={styles.viewBar}>
+            <View style={[styles.viewBarPlay, { width: playWidth }]} />
+          </View>
+        </TouchableOpacity>
+
+        <Text style={styles.txtCounter}>
+          {playTime} / {duration}
+        </Text>
+
+        <View style={styles.playBtnWrapper}>
+          <Button style={styles.btn as any} onPress={onStartPlay} textStyle={styles.txt as any}>
+            Play
+          </Button>
+          <Button style={styles.btn as any} onPress={onStopPlay} textStyle={styles.txt as any}>
+            Stop
+          </Button>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default AudioRecoder;

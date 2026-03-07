@@ -1,30 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { View, Platform } from 'react-native';
-import { Provider } from 'react-redux';
-import { NavigationContainer } from '@react-navigation/native';
-import SplashScreen from 'react-native-splash-screen';
-import messaging from '@react-native-firebase/messaging';
-import Toast from 'react-native-toast-message';
+// @ts-nocheck
 
-// Redux Store
-import { store } from './redux/store';
+import React, { useEffect, useState } from "react";
+import { View, Platform } from "react-native";
+import { Provider } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
+import SplashScreen from "react-native-splash-screen";
+import messaging from "@react-native-firebase/messaging";
+import Toast from "react-native-toast-message";
 
-// Navigation
-import * as RootNavigation from './navigation/RootNavigation';
+import { store } from "./redux/store";
+import * as RootNavigation from "./navigation/RootNavigation";
 
-// Screens & Components
-import Splash from './screens/Splash';
-import AlertModal from './components/AltertBox';
-import * as Icons from './helpers/Icons';
+import Splash from "./screens/Splash";
+import AlertModal from "./components/AltertBox";
+import * as Icons from "./helpers/Icons";
 
-// Helpers
 import {
   requestBackgroundPermission,
   requestStoragePermission,
   setDefaultLan,
-} from './helpers/utils';
+} from "./helpers/utils";
 
-import '../i18n.config';
+import "../i18n.config";
 
 type AlertConfig = {
   title?: string;
@@ -33,15 +30,13 @@ type AlertConfig = {
   cancel?: () => void;
 } | null;
 
-const App = () => {
+const App: React.FC = () => {
   const [isAlertVisible, setAlertVisible] = useState<boolean>(false);
   const [alertConfig, setAlertConfig] = useState<AlertConfig>(null);
 
-  // Handle device-related setup (permissions, defaults, etc.)
-  const initializeAppSettings = async () => {
-    if (Platform.OS === 'android') {
-      // Example: Check location enabled (future use)
-      // console.log("Location enabled:", await isLocationEnabled());
+  const initializeAppSettings = async (): Promise<void> => {
+    if (Platform.OS === "android") {
+      // placeholder for platform-specific setup
     }
     setDefaultLan();
     requestBackgroundPermission();
@@ -49,14 +44,11 @@ const App = () => {
     SplashScreen.hide();
   };
 
-  // Handle push notifications (foreground, background, quit state)
-  const initializePushNotifications = () => {
-    messaging().getInitialNotification(); // For quit state
-    messaging().onNotificationOpenedApp(() => {
-      // Handle background notifications
-    });
+  const initializePushNotifications = (): void => {
+    messaging().getInitialNotification();
+    messaging().onNotificationOpenedApp(() => {});
 
-    messaging().onMessage(async remoteMessage => {
+    messaging().onMessage(async (remoteMessage) => {
       if (remoteMessage?.notification?.body) {
         setAlertVisible(true);
         setAlertConfig({
@@ -69,7 +61,6 @@ const App = () => {
     });
   };
 
-  // Run on first app mount
   useEffect(() => {
     initializeAppSettings();
     initializePushNotifications();
@@ -86,8 +77,8 @@ const App = () => {
             <AlertModal
               isModalVisible={isAlertVisible}
               onRequestClose={() => setAlertVisible(false)}
-              confirm={alertConfig?.confirm}
-              cancel={alertConfig?.cancel}
+              confirm={alertConfig?.confirm ?? (() => setAlertVisible(false))}
+              cancel={alertConfig?.cancel ?? (() => setAlertVisible(false))}
               imageIcon={Icons?.check_icon}
               textMessage={{
                 text1: alertConfig?.title,

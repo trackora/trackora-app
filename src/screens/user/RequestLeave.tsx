@@ -14,7 +14,7 @@ import { RequestLeaveForm } from '../../components/Forms';
 import RequestLeaveHistory from './RequestLeaveHistory';
 import { useTranslation } from 'react-i18next';
 
-const RequestLeave = ({ navigation }) => {
+const RequestLeave = ({ navigation, route }: { navigation: any; route: any }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('request');
 
@@ -76,7 +76,7 @@ const RequestLeave = ({ navigation }) => {
         {activeTab === 'request' ? (
           <RequestLeaveForm />
         ) : (
-          <RequestLeaveHistory />
+          <RequestLeaveHistory navigation={navigation} route={route} />
         )}
       </View>
     </View>

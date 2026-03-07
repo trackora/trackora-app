@@ -1,7 +1,7 @@
 import React from 'react';
 import Get_Content_Data from '../../common/Get_Content_Data';
 
-const Terms_Conditions = ({navigation}) => {
+const Terms_Conditions = ({navigation}:any) => {
   return (
     <Get_Content_Data
       slug={`terms-conditions`}

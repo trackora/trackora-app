@@ -7,7 +7,8 @@ import {
   Platform,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../redux/store';
 import NetInfo from '@react-native-community/netinfo';
 import RNFS from 'react-native-fs';
 import messaging from '@react-native-firebase/messaging';
@@ -33,7 +34,7 @@ import { isApiSuccess } from '../helpers/Validation';
 const SplashScreen = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const userState = useSelector(state => state.user);
+  const userState = useAppSelector(state => state.user);
 
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
@@ -65,9 +66,9 @@ const SplashScreen = () => {
        await messaging().getToken();
       let loginDetails = await getData(Constants.store_key_login_details);
       if (loginDetails) {
-        loginDetails = JSON.parse(loginDetails);
+        const parsed = JSON.parse(loginDetails) as Record<string, unknown>;
         const appData = await getAppDetails();
-        const userData = { ...loginDetails, homeData: appData?.data };
+        const userData = { ...parsed, homeData: appData?.data };
         dispatch(login(userData));
       } else {
         console.log("We are setting the token value to landingpage in splash screen")

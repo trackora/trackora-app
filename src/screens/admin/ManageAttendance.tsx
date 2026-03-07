@@ -10,7 +10,8 @@ import { FlatList } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { toLocaleDateString, toLocaleDateTime } from '../../helpers/utils';
 import { NotFound_result, SvgCalender } from '../../helpers/Svg';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { attendanceV2List } from '../../redux/slices/admin.slice';
 import { apiPostService } from '../../helpers/services';
 import { SvgXml } from 'react-native-svg';
@@ -26,7 +27,7 @@ const today = new Date()
 const ManageAttendance = ({ navigation, route }) => {
     const dispatch = useDispatch();
     const { t } = useTranslation();
-    const attendanceData = useSelector(state => state.admin);
+    const attendanceData = useAppSelector(state => state.admin);
     const [liveLocation, setLiveLocation] = useState(null);
     const [mapModal, setMapModal] = useState(false);
     const [loader, setLoader] = useState(false);
@@ -165,7 +166,7 @@ const ManageAttendance = ({ navigation, route }) => {
                         <Text style={{ marginTop: widthToDp(5), marginLeft: widthToDp(2), color: Config.Colors.black, width: widthToDp(40) }}>{item?.user_name}</Text>
                     </View>
                     <View style={{ flexDirection: "row", gap: 25, marginTop: widthToDp(5), marginRight: widthToDp(7) }}>
-                        <TouchableOpacity style={{ color: "grey" }} onPress={async () => handleUserLocation(item)} >
+                        <TouchableOpacity onPress={async () => handleUserLocation(item)} >
                             <Image source={Icons.address_icon} style={[styles.image, { width: widthToDp(4), height: heightToDp(2) }]} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={async () => await Linking.openURL(`tel:${item?.user_mobile_no}`)}>
@@ -232,7 +233,7 @@ const ManageAttendance = ({ navigation, route }) => {
             </View>
             <View style={styles.body}>
                 <View style={styles.bodyContainer}>
-                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", justifyContent: "space-between", marginBottom: widthToDp(3) }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: widthToDp(3) }}>
                         <TouchableOpacity onPress={() => decreaseDate()} activeOpacity={1}>
                             <Image source={Icons.back_icon}
                                 style={{
@@ -243,7 +244,7 @@ const ManageAttendance = ({ navigation, route }) => {
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handleDatePicker}>
                             <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                                <SvgCalender source={Icons.calendar_icon} style={{ width: widthToDp(6), height: heightToDp(2.5), tintColor: Config.Colors.themeColor }} />
+                                <SvgCalender width={widthToDp(6)} height={heightToDp(2.5)} />
                                 <Text style={{ fontSize: widthToDp(3.5), color: Config.Colors.black }}>{toLocaleDateString(selectedDate).day_name}, {(toLocaleDateString(selectedDate).month_name).slice(0, 3)} {toLocaleDateString(selectedDate).day}</Text>
                             </View>
                         </TouchableOpacity>
@@ -275,7 +276,7 @@ const ManageAttendance = ({ navigation, route }) => {
                             />
                         </View>
                         <CustomInput
-                            commonWidth={"100%"}
+                            commonWidth={widthToDp(100)}
                             onChangeText={(text) => onChange(text)}
                             placeholder={t(Config.employeelistText?.search_emp)}
                             keyboardType={'email-address'}
@@ -381,6 +382,7 @@ const styles = StyleSheet.create({
     firstWord: { backgroundColor: Config.Colors.themeColor, color: Config.Colors.bodyBg, width: 35, height: 35, marginLeft: widthToDp(2), marginTop: widthToDp(4), textAlign: "center", borderRadius: 25, alignItems: "center", flexDirection: "row", fontSize: widthToDp(6) },
     bottomBtn: { position: "absolute", bottom: 0, backgroundColor: Config.Colors.bodyBg, width: widthToDp(95), height: heightToDp(6), alignSelf: "center", borderRadius: 5, marginBottom: widthToDp(2) },
     attendance_details: { height: heightToDp(7), marginBottom: heightToDp(2), flexDirection: 'row', },
+    cellText: { fontFamily: Config.fontFamilys.Poppins_Medium, fontSize: widthToDp(3), color: Config.Colors.black },
     image: { tintColor: Config.Colors.attendenceIcon }
 })
 export default memo(ManageAttendance);

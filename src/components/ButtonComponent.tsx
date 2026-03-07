@@ -51,7 +51,7 @@ const Button = ({
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: justifyContent,
+            justifyContent: justifyContent as 'center' | 'flex-start' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly',
             alignItems: 'center',
           }}>
           {imagePath ? (
@@ -63,11 +63,9 @@ const Button = ({
             <Text
               style={{
                 ...styles.textStyle,
-                ...{
-                  fontSize: customFont,
-                  color: textColor,
-                  fontWeight: customFontWeight,
-                },
+                fontSize: customFont,
+                color: textColor,
+                fontWeight: customFontWeight as 'bold' | 'normal' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900',
               }}>
               {text}
             </Text>

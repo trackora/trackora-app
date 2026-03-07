@@ -16,7 +16,8 @@ import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import * as Svgs from '../../helpers/Svg';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { apiPostService } from '../../helpers/services';
 import { useFocusEffect } from '@react-navigation/native';
 import AltertBox from '../../components/AltertBox';
@@ -31,7 +32,7 @@ import { biometricData, branchesData } from '../../redux/slices/admin.slice';
 
 const Biometric = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const adminData = useSelector(state => state.admin);
+  const adminData = useAppSelector(state => state.admin);
   const [openModal, setOpenModal] = React.useState(false);
   const [isModalVisible, setModalVisible] = React.useState(false);
   const [loader, setLoader] = React.useState(false);
@@ -39,12 +40,21 @@ const Biometric = ({ navigation, route }) => {
 
   const [alertdata, setAlertdata] = React.useState(null);
   const [errorMessage, setErrorMessage] = React.useState(null);
-  let initialInput = {
+  type BiometricFormInputs = {
+    name: string;
+    code: string;
+    brandName: string;
+    id?: string | number;
+    description?: string;
+    status?: number | string;
+    radius?: string;
+  };
+  const initialInput: BiometricFormInputs = {
     name: '',
     code: '',
     brandName: '',
   };
-  const [formInputs, setFormInputs] = React.useState(initialInput);
+  const [formInputs, setFormInputs] = React.useState<BiometricFormInputs>(initialInput);
 
   const goBackScreen = () => {
     navigation.navigate('settings');
@@ -53,7 +63,7 @@ const Biometric = ({ navigation, route }) => {
     setFormInputs(prv => ({ ...prv, [name]: value }));
     setErrorMessage(null);
   };
-  const onSubmit = async biometric_id => {
+  const onSubmit = async (biometric_id?: string | number) => {
     if (formInputs.name === '' && formInputs.code === '') {
       setErrorMessage(prv => ({
         ...prv,
@@ -557,7 +567,7 @@ const Biometric = ({ navigation, route }) => {
                           ? t(Config?.otherText?.update)
                           : t(Config?.otherText?.update)
                       }
-                      onPress={onSubmit}
+                      onPress={() => onSubmit()}
                       color={Config.Colors.defaultColor}
                     />
                   </View>

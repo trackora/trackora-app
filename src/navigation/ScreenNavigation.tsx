@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // depandance
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -6,6 +7,15 @@ import * as Icons from '../helpers/Icons';
 import * as Config from '../helpers/Config';
 import { useTranslation } from 'react-i18next';
 import * as navigationNames from './NavigationNames';
+=======
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as Icons from "../helpers/Icons";
+import * as Config from "../helpers/Config";
+import { useTranslation } from "react-i18next";
+import * as navigationNames from "./NavigationNames";
+import Login from "../screens/user/Login";
+>>>>>>> 985a99218f4d9e24ee8f80ea61b59b6a7010d97b
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +46,11 @@ const HomeStack = () => {
             key={index}
             name={item?.name}
             component={item?.component}
-            initialParams={{ name: t(item?.initialParams?.name) }}
+            initialParams={{
+              name: item?.initialParams?.name
+                ? t(item?.initialParams?.name)
+                : "",
+            }}
           />
         );
       })}
@@ -59,7 +73,11 @@ const AdminHomeStack = () => {
             key={index}
             name={item?.name}
             component={item?.component}
-            initialParams={{ name: t(item?.initialParams?.name) }}
+            initialParams={{
+              name: item?.initialParams?.name
+                ? t(item?.initialParams?.name)
+                : "",
+            }}
           />
         );
       })}

@@ -27,12 +27,13 @@ import {
   CustomInputBox,
 } from '../../components/CustomElements';
 import CustomModal from '../../components/CustomModal';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
 const LeaveRequests = ({ navigation, route }) => {
-  const adminData = useSelector(state => state.admin);
+  const adminData = useAppSelector(state => state.admin);
   const [searchByStatus, setSearchByStatus] = React.useState('All');
   const [leaveListCountData, setLeaveListCountData] = React.useState(null);
   const [leaveListData, setLeaveListData] = React.useState(null);
@@ -89,7 +90,7 @@ const LeaveRequests = ({ navigation, route }) => {
   const ListFooterComponent = () => {
     return loading ? (
       <TouchableOpacity style={{ marginBottom: heightToDp(10), marginTop: 20 }}>
-        <ActivityIndicator size={35} color={Config.Colors.textColor} />
+        <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
       </TouchableOpacity>
     ) : null;
   };
@@ -425,7 +426,7 @@ const LeaveRequests = ({ navigation, route }) => {
               <TouchableOpacity
                 style={{ height: '90%', justifyContent: 'center' }}
               >
-                <ActivityIndicator size={35} color={Config.Colors.textColor} />
+                <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
               </TouchableOpacity>
             )}
           </View>

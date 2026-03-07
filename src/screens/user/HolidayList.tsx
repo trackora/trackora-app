@@ -1,19 +1,17 @@
+import React from 'react';
 import {
   View,
+  Text,
   StyleSheet,
   FlatList,
-  Text,
   ScrollView,
-  Alert,
+  TouchableOpacity,
 } from 'react-native';
-import React, { useState } from 'react';
 import { Header_2 } from '../../components/Header';
 import * as Icons from '../../helpers/Icons';
 import * as Config from '../../helpers/Config';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
 import { useTranslation } from 'react-i18next';
-import { TouchableOpacity } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { apiPostService } from '../../helpers/services';
 import * as Constants from '../../helpers/Constants';
 import { isApiSuccess } from '../../helpers/Validation';
@@ -23,13 +21,39 @@ import {
   CustomLinearButton,
 } from '../../components/CustomElements';
 import { SvgCalender } from '../../helpers/Svg';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
 import Toast from 'react-native-toast-message';
 import AltertBox from '../../components/AltertBox';
-
-const HolidayList = ({ navigation, route }) => {
+ 
+const CustomModalAny = CustomModal as React.ComponentType<any>;
+const CustomInputAny = CustomInput as React.ComponentType<any>;
+const CustomLinearButtonAny = CustomLinearButton as React.ComponentType<any>;
+ 
+type HolidayItem = {
+  id?: number | string;
+  holiday_name?: string;
+  holiday_date?: string;
+  is_holiday_added?: number;
+};
+ 
+type HolidayAlert = {
+  statusText: string;
+  confirm: () => void;
+  cancel: () => void;
+};
+ 
+type HolidayListProps = {
+  navigation: {
+    goBack: () => void;
+  };
+  route?: any;
+};
+ 
+const HolidayList: React.FC<HolidayListProps> = ({ navigation }) => {
   const { t } = useTranslation();
-  const [holidayList, setHolidayList] = React.useState([]);
+  const [holidayList, setHolidayList] = React.useState<HolidayItem[]>([]);
   const [openModal, setOpenModal] = React.useState(false);
   const [field, setField] = React.useState({
     holiday_name: '',
@@ -38,41 +62,38 @@ const HolidayList = ({ navigation, route }) => {
   const [dateObj, setDateObj] = React.useState(new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
   const [isModalVisible, setisModalVisible] = React.useState(false);
-  const [holidayAlertData, setHolidayAlertData] = React.useState(null);
-
-  // For going back to previous screen
+  const [holidayAlertData, setHolidayAlertData] =
+    React.useState<HolidayAlert | null>(null);
+ 
   const goBackScreen = () => {
     navigation.goBack();
   };
-
-  // For changing holiday date
-  const handleDateChange = React.useCallback((event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setDateObj(selectedDate);
-      // save formatted string for API
-      const formatted = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
-      setField(prev => ({ ...prev, holiday_date: formatted }));
-    }
-  }, []);
-
-  const handleOnChange = (key, value) => {
-    setField({ ...field, [key]: value });
+ 
+  const handleDateChange = React.useCallback(
+    (event: DateTimePickerEvent, selectedDate?: Date) => {
+      setShowDatePicker(false);
+      if (selectedDate) {
+        setDateObj(selectedDate);
+        const formatted = selectedDate.toISOString().split('T')[0];
+        setField(prev => ({ ...prev, holiday_date: formatted }));
+      }
+    },
+    [],
+  );
+ 
+  const handleOnChange = (key: 'holiday_name' | 'holiday_date', value: string) => {
+    setField(prev => ({ ...prev, [key]: value }));
   };
-
-  // For getting all holidays
+ 
   const fetchHolidayList = React.useCallback(async () => {
-    const apiData = await apiPostService(Constants?.holidayList, {
-      filter: '',
-    });
+    const apiData = await apiPostService(Constants?.holidayList, { filter: '' });
     if (isApiSuccess(apiData)) {
-      setHolidayList(apiData?.data?.result?.data);
+      setHolidayList(apiData?.data?.result?.data ?? []);
     }
   }, []);
-
-  // For adding holiday
+ 
   const addHoliday = React.useCallback(
-    async bodyData => {
+    async (bodyData?: Partial<typeof field>) => {
       const apiData = await apiPostService(
         Constants.addHolidayApi,
         bodyData ? bodyData : field,
@@ -97,10 +118,10 @@ const HolidayList = ({ navigation, route }) => {
         });
       }
     },
-    [field],
+    [field, fetchHolidayList, openModal],
   );
-
-  const handleRemoveHoliday = id => {
+ 
+  const handleRemoveHoliday = (id?: number | string) => {
     setisModalVisible(true);
     setHolidayAlertData({
       statusText: 'Are you sure you want to delete this holiday ?',
@@ -108,9 +129,8 @@ const HolidayList = ({ navigation, route }) => {
       cancel: () => setisModalVisible(false),
     });
   };
-
-  // For Removing Holiday
-  const removeHoliday = async id => {
+ 
+  const removeHoliday = async (id?: number | string) => {
     const apiData = await apiPostService(Constants.updateHoliday, {
       id: `${id}`,
       status: 0,
@@ -133,9 +153,8 @@ const HolidayList = ({ navigation, route }) => {
     }
     setisModalVisible(false);
   };
-
-  // For showing holiday list
-  const showHolidays = ({ item }) => {
+ 
+  const showHolidays = ({ item }: { item: HolidayItem }) => {
     return (
       <View
         style={{
@@ -160,10 +179,8 @@ const HolidayList = ({ navigation, route }) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}
-          onPress={() => {}}
         >
           <View style={{ flex: 1 }}>
-            {/* Holiday Name */}
             <Text
               style={{
                 color: Config.Colors.textColor.textColor_1,
@@ -174,8 +191,7 @@ const HolidayList = ({ navigation, route }) => {
             >
               {item?.holiday_name}
             </Text>
-
-            {/* Date with calendar icon */}
+ 
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text
                 style={{
@@ -188,8 +204,7 @@ const HolidayList = ({ navigation, route }) => {
               </Text>
             </View>
           </View>
-
-          {/* Add / Remove button */}
+ 
           <TouchableOpacity
             onPress={() =>
               item?.is_holiday_added == 0
@@ -202,8 +217,8 @@ const HolidayList = ({ navigation, route }) => {
             style={{
               backgroundColor:
                 item?.is_holiday_added == 0
-                  ? 'rgba(34,197,94,0.1)' // green tint
-                  : 'rgba(239,68,68,0.1)', // red tint
+                  ? 'rgba(34,197,94,0.1)'
+                  : 'rgba(239,68,68,0.1)',
               paddingHorizontal: 14,
               paddingVertical: 6,
               borderRadius: 8,
@@ -223,11 +238,11 @@ const HolidayList = ({ navigation, route }) => {
       </View>
     );
   };
-
+ 
   React.useEffect(() => {
     fetchHolidayList();
-  }, []);
-
+  }, [fetchHolidayList]);
+ 
   return (
     <View style={styles.container}>
       <Header_2
@@ -237,7 +252,7 @@ const HolidayList = ({ navigation, route }) => {
         commonHeight={heightToDp(5)}
         onPressRight={() => setOpenModal(true)}
         tintColorRight={Config.Colors.defaultColor}
-        leftText={`Holiday List`}
+        leftText="Holiday List"
         animated={true}
         onPressLeft={goBackScreen}
       />
@@ -245,8 +260,9 @@ const HolidayList = ({ navigation, route }) => {
         renderItem={showHolidays}
         data={holidayList}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item, index) => item + index}
+        keyExtractor={(_, index) => String(index)}
       />
+ 
       {isModalVisible ? (
         <AltertBox
           isModalVisible={isModalVisible}
@@ -259,9 +275,9 @@ const HolidayList = ({ navigation, route }) => {
           }}
         />
       ) : null}
-
+ 
       {openModal ? (
-        <CustomModal
+        <CustomModalAny
           modalVisible={openModal}
           onRequestClose={() => {
             setOpenModal(!openModal);
@@ -286,7 +302,7 @@ const HolidayList = ({ navigation, route }) => {
                 leftImage={Icons.arrow_back}
                 commonWidth={widthToDp(12)}
                 commonHeight={heightToDp(5)}
-                leftText={'Add Holiday'}
+                leftText="Add Holiday"
                 animated={true}
                 onPressLeft={() => {
                   setOpenModal(!openModal);
@@ -308,31 +324,31 @@ const HolidayList = ({ navigation, route }) => {
                     gap: 20,
                   }}
                 >
-                  <CustomInput
+                  <CustomInputAny
                     backgroundColor={Config.Colors.defaultColor}
-                    placeholder={'Enter Holiday Name'}
-                    keyboardType={'default'}
-                    autoCapitalize={'none'}
-                    autoComplete={'given-name'}
+                    placeholder="Enter Holiday Name"
+                    keyboardType="default"
+                    autoCapitalize="none"
+                    autoComplete="given-name"
                     bgColor={Config.Colors.inputField}
                     countryCodeStatus={true}
-                    onChangeText={text => handleOnChange('holiday_name', text)}
+                    onChangeText={(text: string) =>
+                      handleOnChange('holiday_name', text)
+                    }
                     value={field?.holiday_name}
                     commonWidth={widthToDp(90)}
                     commonHeight={widthToDp(15)}
                     textAlignVertical="center"
                     leftImage={Icons?.branch_icon}
-                    errorMessage={''}
+                    errorMessage=""
                     borderColor={Config.Colors.borderColor}
                   />
-                  <View
-                    style={{ flexDirection: 'row', justifyContent: 'center' }}
-                  >
+                  <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                     <TouchableOpacity
                       style={{
                         flexDirection: 'row',
                         alignItems: 'center',
-                        justifyContent: 'start',
+                        justifyContent: 'flex-start',
                         backgroundColor: Config.Colors.defaultColor,
                         borderRadius: 8,
                         borderWidth: 1,
@@ -350,7 +366,6 @@ const HolidayList = ({ navigation, route }) => {
                             ? Config.Colors.black
                             : '#999',
                           fontSize: widthToDp(3.8),
-
                           fontFamily: Config.fontFamilys.Poppins_Medium,
                         }}
                       >
@@ -360,7 +375,7 @@ const HolidayList = ({ navigation, route }) => {
                   </View>
                   {showDatePicker && (
                     <DateTimePicker
-                      value={dateObj} // ✅ must be Date, not string
+                      value={dateObj}
                       mode="date"
                       display="spinner"
                       onChange={handleDateChange}
@@ -368,32 +383,31 @@ const HolidayList = ({ navigation, route }) => {
                       maximumDate={new Date(new Date().getFullYear(), 11, 31)}
                     />
                   )}
-                  <View
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <CustomLinearButton
+                  <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <CustomLinearButtonAny
                       commonWidth={widthToDp(40)}
                       text={t(Config.otherText?.submit)}
                       onPress={() => addHoliday()}
                       color={Config.Colors.defaultColor}
+                      Icons={null}
+                      tintColor={Config.Colors.defaultColor}
+                      IconsRigth={null}
+                      padding={0}
                     />
                   </View>
                 </View>
               </View>
             </View>
           </ScrollView>
-        </CustomModal>
+        </CustomModalAny>
       ) : null}
     </View>
   );
 };
+ 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  body: {
-    marginTop: 10,
-  },
+  container: { flex: 1 },
+  body: { marginTop: 10 },
   text: {
     fontFamily: Config.fontFamilys.Poppins_Bold,
     color: '#000',
@@ -405,17 +419,7 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
   },
-  boxContainer: {
-    alignSelf: 'center',
-    // bottom: 10
-  },
-  // boxContainerIner: {
-  //   marginBottom: widthToDp(16),
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   backgroundColor: 'rgba(0, 0, 0, 0)',
-  //   height: heightToDp(70)
-  // },
+  boxContainer: { alignSelf: 'center' },
   bottomImg: {
     backgroundColor: Config.Colors.bodyBg,
     width: widthToDp(10),
@@ -472,4 +476,5 @@ const styles = StyleSheet.create({
     color: 'white',
   },
 });
+ 
 export default React.memo(HolidayList);

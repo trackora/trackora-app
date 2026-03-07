@@ -9,7 +9,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { useTranslation } from 'react-i18next';
 import {
   CustomLinearButton,
@@ -40,7 +41,7 @@ const LoginScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   // Redux state
-  const loginState = useSelector(state => state.login);
+  const loginState = useAppSelector(state => state.login);
 
   // UI states
   const [isOtpVisible, setIsOtpVisible] = useState(false);

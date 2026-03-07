@@ -1,31 +1,47 @@
+import React from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
   StyleSheet,
-  Image,
   ScrollView,
-  FlatList,
-  ActivityIndicator,
   useWindowDimensions,
-} from 'react-native';
-import React from 'react';
-import { Header_2 } from '../components/Header';
-import * as Icons from '../helpers/Icons';
-import * as Config from '../helpers/Config';
-import * as Constants from '../helpers/Constants';
-import RenderHTML from 'react-native-render-html';
-import { heightToDp, widthToDp } from '../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
-import { apiPostService } from '../helpers/services';
-import { useFocusEffect } from '@react-navigation/native';
-import { login } from '../redux/slices/login.slice';
-import { useTranslation } from 'react-i18next';
+} from "react-native";
+import { Header_2 } from "../components/Header";
+import * as Icons from "../helpers/Icons";
+import * as Config from "../helpers/Config";
+import * as Constants from "../helpers/Constants";
+import RenderHTML from "react-native-render-html";
+import { heightToDp, widthToDp } from "../helpers/Responsive";
+import { useDispatch, useSelector } from "react-redux";
+import { apiPostService } from "../helpers/services";
+import { useFocusEffect } from "@react-navigation/native";
+import { login } from "../redux/slices/login.slice";
 
-const Get_Content_Data = ({ slug, dataStoreKey, headerText, navigation }) => {
+type RootState = {
+  login?: any;
+};
+
+type GetContentDataProps = {
+  slug: string;
+  dataStoreKey: string;
+  headerText: string;
+  navigation: {
+    goBack: () => void;
+  };
+};
+
+const Get_Content_Data: React.FC<GetContentDataProps> = ({
+  slug,
+  dataStoreKey,
+  headerText,
+  navigation,
+}) => {
   const dispatch = useDispatch();
-  const data = useSelector(state => state.login?.data?.[dataStoreKey]?.data);
-  const getTokenData = useSelector(state => state.login);
+  const data = useSelector(
+    (state: RootState) => state.login?.data?.[dataStoreKey]?.data,
+  ) as { title?: string; description?: string } | undefined;
+
+  const getTokenData = useSelector((state: RootState) => state.login);
   const { width } = useWindowDimensions();
 
   const goBackScreen = () => {
@@ -34,10 +50,10 @@ const Get_Content_Data = ({ slug, dataStoreKey, headerText, navigation }) => {
 
   const fetchContentData = async () => {
     try {
-      const bodyData = { slug, lang: 'en' };
+      const bodyData = { slug, lang: "en" };
       const apiData = await apiPostService(Constants.get_content_api, bodyData);
       const updatedStore = {
-        ...getTokenData.data,
+        ...getTokenData?.data,
         [dataStoreKey]: apiData?.data,
       };
       dispatch(login(updatedStore));
@@ -49,12 +65,12 @@ const Get_Content_Data = ({ slug, dataStoreKey, headerText, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       fetchContentData();
-    }, []),
+    }, [slug, dataStoreKey]),
   );
 
   React.useEffect(() => {
     fetchContentData();
-  }, []);
+  }, [slug, dataStoreKey]);
 
   return (
     <View style={styles.container}>
@@ -69,10 +85,10 @@ const Get_Content_Data = ({ slug, dataStoreKey, headerText, navigation }) => {
 
       <ScrollView style={{ marginBottom: 10 }}>
         <View style={styles.body}>
-          <View style={styles?.boxContainerIner}>
+          <View style={styles.boxContainerIner}>
             <Text
               style={{
-                textAlign: 'justify',
+                textAlign: "justify",
                 fontFamily: Config.fontFamilys.Poppins_Bold,
                 color: Config.Colors.black,
               }}
@@ -81,9 +97,9 @@ const Get_Content_Data = ({ slug, dataStoreKey, headerText, navigation }) => {
             </Text>
             {data?.description && (
               <RenderHTML
-                style={{ textAlign: 'justify', color: Config.Colors.black }}
                 contentWidth={width}
                 source={{ html: data?.description }}
+                baseStyle={{ textAlign: "justify", color: Config.Colors.black }}
               />
             )}
           </View>
@@ -102,16 +118,15 @@ const styles = StyleSheet.create({
     minHeight: heightToDp(8),
     backgroundColor: Config.Colors.defaultColor,
     borderRadius: 10,
-    justifyContent: 'space-between',
-    alignContent: 'center',
-
+    justifyContent: "space-between",
+    alignContent: "center",
     padding: widthToDp(4),
   },
   body: {
     marginTop: widthToDp(3),
     width: widthToDp(100),
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 0.1,
   },
 });

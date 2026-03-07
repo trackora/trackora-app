@@ -14,7 +14,8 @@ import * as Icons from '../../helpers/Icons';
 import * as Config from '../../helpers/Config';
 import * as Constants from '../../helpers/Constants';
 import { heightToDp, widthToDp } from '../../helpers/Responsive';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/store';
 import { handleCamera, toLocaleDateString } from '../../helpers/utils';
 import { apiPostService } from '../../helpers/services';
 import { useFocusEffect } from '@react-navigation/native';
@@ -27,7 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { isApiSuccess } from '../../helpers/Validation';
 
 const Notes = ({ navigation, route }) => {
-  const getTokenData = useSelector(state => state.login);
+  const getTokenData = useAppSelector(state => state.login);
   const [chatMessage, setChatMessage] = React.useState([]);
   const [message, setMessage] = React.useState('');
   const [openModal, setOpenModal] = React.useState(false);
@@ -195,7 +196,7 @@ const Notes = ({ navigation, route }) => {
                 >
                   <ActivityIndicator
                     size={35}
-                    color={Config.Colors.textColor}
+                    color={Config.Colors.textColor.textColor_1}
                   />
                 </View>
               ) : null}
@@ -248,7 +249,7 @@ const Notes = ({ navigation, route }) => {
                 height: '100%',
               }}
             >
-              <ActivityIndicator size={35} color={Config.Colors.textColor} />
+              <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
             </View>
           ) : (
             <View
@@ -361,7 +362,7 @@ const Notes = ({ navigation, route }) => {
                 <View style={{ gap: widthToDp(2), marginTop: widthToDp(3) }}>
                   <TouchableOpacity
                     style={{ flexDirection: 'row', gap: widthToDp(2) }}
-                    onPress={() => uploadDoc()}
+                    onPress={() => uploadDoc('openPicker')}
                   >
                     <Image
                       source={Icons?.gallery_icon}
@@ -410,7 +411,7 @@ const Notes = ({ navigation, route }) => {
                 height: '100%',
               }}
             >
-              <ActivityIndicator size={35} color={Config.Colors.textColor} />
+              <ActivityIndicator size={35} color={Config.Colors.textColor.textColor_1} />
             </View>
           ) : null}
           {fullImage ? (

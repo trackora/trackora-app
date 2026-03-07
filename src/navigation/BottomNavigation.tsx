@@ -1,6 +1,9 @@
 import * as Icons from '../helpers/Icons';
 import * as Config from '../helpers/Config';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 985a99218f4d9e24ee8f80ea61b59b6a7010d97b
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CustomTabBarIcon from '../components/CustomTabBarIcon';
 import Settings from '../screens/admin/Settings';
@@ -20,7 +23,10 @@ const BottomTabs = () => {
       // tabBar={props => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
+<<<<<<< HEAD
         // gestureEnabled: true,
+=======
+>>>>>>> 985a99218f4d9e24ee8f80ea61b59b6a7010d97b
         tabBarActiveTintColor: Config.Colors.themeColor,
         tabBarInactiveTintColor: Config.Colors.bottomColor,
         tabBarStyle: {
@@ -86,7 +92,10 @@ const AdminBottomTabs = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+<<<<<<< HEAD
         // gestureEnabled: true,
+=======
+>>>>>>> 985a99218f4d9e24ee8f80ea61b59b6a7010d97b
         tabBarActiveTintColor: Config.Colors.themeColor,
         tabBarInactiveTintColor: Config.Colors.themeColor,
         tabBarStyle: {

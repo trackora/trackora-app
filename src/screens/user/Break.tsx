@@ -88,6 +88,7 @@ const Break = ({ navigation }) => {
       });
       setOpenModal(false);
       setBreakField({
+        id: undefined,
         break_name: '',
         break_type: '',
         break_duration: '',
@@ -290,6 +291,7 @@ const Break = ({ navigation }) => {
   const addBreakModule = () => {
     setIsUpdating(false);
     setBreakField({
+      id: undefined,
       break_name: '',
       break_type: '',
       break_duration: '',

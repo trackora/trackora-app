@@ -25,10 +25,9 @@ interface CustomMenuProps {
   item: MenuItem;
   onPress: (title?: string) => void;
   bottomImg?: ImageSourcePropType | null;
-  style?: {
-    box?: ViewStyle;
-    bottomImg?: ViewStyle;
-  };
+  style?: Record<string, any>;
+  commonWidth?: number;
+  commonHeight?: number;
   tintColor1?: string;
   tintColor2?: string;
   disBottomImg?: ImageSourcePropType;

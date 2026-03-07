@@ -259,7 +259,7 @@ export const RequestLeaveForm = () => {
                 onPress={() => setShowDatePicker(true)}
               >
                 {/* <Text style={{ color:Config.Colors.black,fontSize: widthToDp(3.5), paddingRight: widthToDp(2), color: Config.Colors.black }}>{selectedDate.toDateString()}</Text> */}
-                <SvgCalender />
+                <SvgCalender width={24} height={24} />
               </TouchableOpacity>
             </TouchableOpacity>
           </View>
@@ -275,9 +275,8 @@ export const RequestLeaveForm = () => {
             >
               <Text
                 style={{
-                  color: Config.Colors.black,
-                  fontSize: widthToDp(4),
                   color: Config.Colors.themeColor,
+                  fontSize: widthToDp(4),
                 }}
               >
                 End Date
@@ -305,7 +304,7 @@ export const RequestLeaveForm = () => {
                   onPress={() => setShowEndDatePicker(true)}
                 >
                   {/* <Text style={{ fontSize: widthToDp(3.5), paddingRight: widthToDp(2), color: Config.Colors.black }}>{SvgCalender}</Text> */}
-                  <SvgCalender />
+                  <SvgCalender width={24} height={24} />
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -318,15 +317,14 @@ export const RequestLeaveForm = () => {
               justifyContent: 'flex-start',
             }}
           >
-            <Text
-              style={{
-                color: Config.Colors.black,
-                fontSize: widthToDp(4),
-                color: Config.Colors.themeColor,
-              }}
-            >
-              Subject
-            </Text>
+<Text
+            style={{
+              color: Config.Colors.themeColor,
+              fontSize: widthToDp(4),
+            }}
+          >
+            Subject
+          </Text>
           </View>
           <View
             style={{
@@ -599,12 +597,12 @@ const styles = StyleSheet.create({
     borderTopColor: Config.Colors.themeColor,
     padding: widthToDp(3),
   },
-  // btnLeave: {
-  //     backgroundColor: Config.Colors.inputField_1,
-  //     padding: widthToDp(1.5),
-  //     marginRight: widthToDp(3),
-  //     borderRadius: 5,
-  // },
+  btnLeave: {
+    backgroundColor: Config.Colors.inputField_1,
+    padding: widthToDp(1.5),
+    marginRight: widthToDp(3),
+    borderRadius: 5,
+  },
 
   input: {
     height: 100,
